@@ -16,6 +16,14 @@ abstract class Piece {
 	Color color;
 	Variant type;
 	int row, col;
-	bool isValidMove(int x, int y);
 
-}
+	Piece(Color color, int r, int c, Variant type)
+	{
+		this.color = color;
+		this.row = r;
+		this.col = c;
+		this.type = type;
+	}
+
+	abstract boolean isValidMove(int x, int y);
+}	
