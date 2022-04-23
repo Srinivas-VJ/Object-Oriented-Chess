@@ -1,12 +1,12 @@
-### Object oriented chess
+# Object oriented chess
 
-compile pieces package:-
+### compile pieces package:-
 
 ```
 javac -d . Colour.java Variant.java Piece.java Bishop.java King.java Knight.java Pawn.java Queen.java Rook.java
 ```
 
-Run the whole thing:-
+### Run the whole thing:-
 
 ```
 java test
