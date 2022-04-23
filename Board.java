@@ -1,155 +1,158 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
+import Pieces.Piece;
+import Pieces.Pawn;
+import Pieces.Colour;
+import Pieces.Variant;
+import Pieces.Rook;
+import Pieces.Bishop;
+import Pieces.King;
+import Pieces.Queen;
+import Pieces.Knight;
 
-public class Board extends JPanel implements MouseListener, MouseMotionListener{
+public class Board {
+	// singleton for board
+	private static boolean hasBeenInitialized = false;
 
-	static int oldMouseX,oldMouseY,newMouseX, newMouseY;
-	static int squareSize=63;
-	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		this.addMouseListener(this);
-        this.addMouseMotionListener(this);
-		for(int i=0;i<64;i+=2){
-			g.setColor(new Color(255,200,100));
-			g.fillRect((i%8+(i/8)%2)*squareSize, (i/8)*squareSize, squareSize, squareSize);
-			g.setColor(new Color(150,50,30));
-			g.fillRect(((i+1)%8-((i+1)/8)%2)*squareSize, ((i+1)/8)*squareSize, squareSize, squareSize);
+	//represent the actual game state 
+	static Piece game_board[][];
+	
+	// a temporary game state to test things
+	static Piece temp_board[][];
+	
+
+	
+	private Board()
+	{
+		temp_board = new Pieces.Piece[8][8];
+		game_board = new Pieces.Piece[8][8];
+		initBoard(temp_board);
+		initBoard(game_board);
+	}
+	
+	public static Piece[][] getBoard()
+	{
+		if (!hasBeenInitialized)
+		{
+			Board b = new Board();
+			hasBeenInitialized = true;
+			return game_board;
 		}
-		Image chessPiecesImage;
-        chessPiecesImage=new ImageIcon("ChessPieces.png").getImage();
-        int x,y,x1=-1,y1=-1;
-        
-      /*  switch (AlphaBetaChess.chessBoard[oldMouseX][oldMouseY]) {
-   	 	case "P": x1=5; y1=0;
-        	 break;
-        case "p": x1=5; y1=1;
-            break;
-        case "R": x1=2; y1=0;
-            break;
-        case "r": x1=2; y1=1;
-            break;
-        case "K": x1=4; y1=0;
-            break;
-        case "k": x1=4; y1=1;
-            break;
-        case "B": x1=3; y1=0;
-            break;
-        case "b": x1=3; y1=1;
-            break;
-        case "Q": x1=1; y1=0;
-            break;
-        case "q": x1=1; y1=1;
-            break;
-        case "A": x1=0; y1=0;
-            break;
-        case "a": x1=0; y1=1;
-            break;
-   	}
-        g.drawImage(chessPiecesImage, (newMouseX-15), (newMouseY-15), (newMouseX+64), (newMouseY+64), x1*64, y1*64, (x1+1)*64, (y1+1)*64, this);*/
-        for(int i=0;i<64;i++){
-        	x=-1;
-        	y=-1;
-	    	 switch (AlphaBetaChess.chessBoard[i/8][i%8]) {
-	    	 case "P": x=5; y=0;
-             	 break;
-	         case "p": x=5; y=1;
-	             break;
-	         case "R": x=2; y=0;
-	             break;
-	         case "r": x=2; y=1;
-	             break;
-	         case "K": x=4; y=0;
-	             break;
-	         case "k": x=4; y=1;
-	             break;
-	         case "B": x=3; y=0;
-	             break;
-	         case "b": x=3; y=1;
-	             break;
-	         case "Q": x=1; y=0;
-	             break;
-	         case "q": x=1; y=1;
-	             break;
-	         case "A": x=0; y=0;
-	             break;
-	         case "a": x=0; y=1;
-	             break;
-	    	}
-	    if(x!=-1 && y!=-1)
-	    	g.drawImage(chessPiecesImage, (i%8)*squareSize, (i/8)*squareSize, (i%8+1)*squareSize, (i/8+1)*squareSize, x*64, y*64, (x+1)*64, (y+1)*64, this);	    	
-        }
+		return game_board;
 	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-		if(e.getX()<8*squareSize && e.getY()<8*squareSize){//if mouse is dragged inside the chess board
-			newMouseX=e.getX();
-			newMouseY=e.getY();
-			repaint();
-		}			
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
+	public static void main(String args[])
+	{
+		Board b = new Board();
+		b.printBoard();
 	}
-
-	@Override
-	public void mouseClicked(MouseEvent e) {
-		// TODO Auto-generated method stub
+	
+	
+	private void initBoard(Piece b[][])
+	{
+		// making the pawns
+		for (int r = 0; r < 8; r++)
+		{
+			for(int c = 0; c < 8; c++)
+			{
 		
-	}
-
-	@Override
-	public void mousePressed(MouseEvent e) {
-		if(e.getX()<8*squareSize && e.getY()<8*squareSize){//if mouse is pressed inside the chess board
-			oldMouseX=e.getX()/squareSize;
-			oldMouseY=e.getY()/squareSize;
-		}		
-	}
-
-	@Override
-	public void mouseReleased(MouseEvent e) {
-		if(e.getX()<8*squareSize && e.getY()<8*squareSize){//if mouse is released inside the chess board
-			newMouseX=e.getX()/squareSize;
-			newMouseY=e.getY()/squareSize;
-			String move;
-			if(e.getButton()==MouseEvent.BUTTON1){
-				if(newMouseY==0 && oldMouseY==1 && "P".equals(AlphaBetaChess.chessBoard[oldMouseY][oldMouseX])){
-					//if pawn promotion
-					move=""+oldMouseX+newMouseX+AlphaBetaChess.chessBoard[newMouseY][newMouseX]+"QP";
-				}	
-				else{	//if a regular move
-					move=""+oldMouseY+oldMouseX+newMouseY+newMouseX+AlphaBetaChess.chessBoard[newMouseY][newMouseX];
-				}							
-				String userPossibleMoves=AlphaBetaChess.possibleMoves();
-				if(userPossibleMoves.replaceAll(move, "").length()<userPossibleMoves.length()){
-					AlphaBetaChess.makeMove(move);
-					AlphaBetaChess.flipBoard();
-					AlphaBetaChess.makeMove(AlphaBetaChess.alphaBeta(AlphaBetaChess.globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
-					AlphaBetaChess.flipBoard();
-					repaint();
-				}
+				if (r == 6)
+					b[r][c] = new Pawn(Colour.WHITE);
+				else if (r == 1)
+					b[r][c] = new Pawn(Colour.BLACK);
+				else
+					b[r][c] = null;
+	
 			}
-		}		
-	}
-
-	@Override
-	public void mouseEntered(MouseEvent e) {
-		// TODO Auto-generated method stub
+		}
+		
+		// making the Kings
+		b[0][4] = new King(Colour.BLACK);
+		b[7][4] = new King(Colour.WHITE);
+		
+		// making the Queens
+		b[0][3] = new Queen(Colour.BLACK);
+		b[7][3] = new Queen(Colour.WHITE);
+		
+		// making the Rooks
+		b[0][0] = new Rook(Colour.BLACK);
+		b[0][7] = new Rook(Colour.BLACK);
+		b[7][0] = new Rook(Colour.WHITE);
+		b[7][7] = new Rook(Colour.WHITE);
+		
+		// making the Bishops
+		b[0][2] = new Bishop(Colour.BLACK);
+		b[0][5] = new Bishop(Colour.BLACK);
+		b[7][2] = new Bishop(Colour.WHITE);
+		b[7][5] = new Bishop(Colour.WHITE);
+		
+		// making the Knights
+		b[0][1] = new Knight(Colour.BLACK);
+		b[0][6] = new Knight(Colour.BLACK);
+		b[7][1] = new Knight(Colour.WHITE);
+		b[7][6] = new Knight(Colour.WHITE);
 		
 	}
-
-	@Override
-	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
-		
+	
+	public void printBoard()
+	{
+		for (int r = 0; r < 8; r++)
+		{
+			for (int c = 0; c < 8; c++)
+			{
+				Piece p = temp_board[r][c];
+				if (p == null)
+					System.out.print(" . ");
+				else
+				{
+					switch(p.type)
+					{
+					case KING:
+						if (p.color == Colour.BLACK)
+							System.out.print(" k ");
+						else
+							System.out.print(" K ");
+						break;
+					case BISHOP:
+						if (p.color == Colour.BLACK)
+							System.out.print(" b ");
+						else
+							System.out.print(" B ");
+						break;
+					case KNIGHT:
+						if (p.color == Colour.BLACK)
+							System.out.print(" h ");
+						else
+							System.out.print(" H ");
+						break;
+					case PAWN:
+						if (p.color == Colour.BLACK)
+							System.out.print(" p ");
+						else
+							System.out.print(" P ");
+						break;
+					case QUEEN:
+						if (p.color == Colour.BLACK)
+							System.out.print(" q ");
+						else
+							System.out.print(" Q ");
+						break;
+					case ROOK:
+						if (p.color == Colour.BLACK)
+							System.out.print(" r ");
+						else
+							System.out.print(" R ");
+						break;
+					default:
+						System.out.println(" ");
+						
+					}
+					
+				}
+					
+				
+			}
+			System.out.println("");
+		}
 	}
 }
+
+ 

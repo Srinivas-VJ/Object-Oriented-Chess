@@ -1,29 +1,14 @@
-enum Color {
-	BLACK,
-	WHITE;
-}
+package Pieces;
+abstract public class Piece {
+	public Colour color;
+	public Variant type;
 
-enum Variant {
-	PAWN,
-	ROOK,
-	KNIGHT,
-	BISHOP,
-	QUEEN,
-	KING;
-}
-
-abstract class Piece {
-	Color color;
-	Variant type;
-	int row, col;
-
-	Piece(Color color, int r, int c, Variant type)
+	public Piece(Colour color, Variant type)
 	{
 		this.color = color;
-		this.row = r;
-		this.col = c;
 		this.type = type;
 	}
 
-	abstract boolean isValidMove(int x, int y);
-}	
+	abstract public boolean isValidMove(int r, int c, int x, int y);
+}
+
