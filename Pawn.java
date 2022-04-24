@@ -7,27 +7,59 @@ public class Pawn extends Piece {
 
 	@Override
 	public boolean isValidMove(int r1, int c1, int r2, int c2) {
-		// TODO Auto-generated method stub
-		// Piece board[][] = Board.getBoard();
-		// boolean res;
-		// if (c1 == c2 )
-		// {
-		// 	if ((r1 == 6) && (board[r2][c2] == null) && (board[r1 - 1][c2] == null) &&  (r2==4 || r2==5) && (board[r1][c1].color == Colour.WHITE))
-		// 		return true;			
-		// 	else if ((r2+1) == r1 && (board[r2][c2] == null) && (board[r1][c1].color == Colour.WHITE))
-		// 		return true;
-		// 	if ((r1 == 1) && (board[r2][c2] == null) && (board[r1 + 1][c2] == null) &&  (r2==3 || r2==2)&& (board[r1][c1].color == Colour.BLACK))
-            	// 		return true;
-        	// 	else if ((r2-1) == r1 && (board[r2][c2] == null)&& (board[r1][c1].color == Colour.WHITE))
-           	// 		return true;
-		// }
-		// else if ((board[r2][c2].color == Colour.BLACK) && (r2 == (r1 - 1)) && (c2 == (c1 - 1) ||  c2 == (c1+1)) && (board[r1][c1].color == Colour.WHITE))
-		// 	return true;
-		// else if ((board[r2][c2].color == Colour.WHITE) && (r2 == (r1 + 1)) && (c2 == (c1 - 1) ||  c2 == (c1+1) && (board[r1][c1].color == Colour.BLACK)))
-        	// 	return true;
+		Piece board[][] = Board.getBoard();
 		
-		// return false;
-		return true;
+		//same block
+		if (r1 == r2 && c1 == c2) {
+			return false;
+		}
+
+		if (board[r1][c1].color == Colour.WHITE)
+		{
+			boolean res;
+			if (c1 == c2 )
+			{	
+				// allow two steps first move
+				if ((r1 == 6) && (board[r2][c2] == null) && (board[r1 - 1][c2] == null) &&  (r2==4 || r2==5))
+					res = true;
+				// typical pawn move
+				else if ((r2+1) == r1 && (board[r2][c2] == null))
+					res = true;
+				else
+					res = false;
+			}
+			//capture
+			else if ((board[r2][c2] != null) && (board[r2][c2].color == Colour.BLACK) && (r2 == (r1 - 1)) && (c2 == (c1 - 1) ||  c2 == (c1+1)))
+				res = true;
+			else
+				res = false;
+			
+			return res;
+
+		}
+		// same thing for black code could be optimised
+		else
+		{
+			boolean res;
+			if (c1 == c2 )
+			{
+				// allow two steps first move
+				if ((r1 == 1) && (board[r2][c2] == null) && (board[r1 + 1][c2] == null) &&  (r2==3 || r2==2))
+					res = true;
+				// typical pawn move
+				else if ((r2-1) == r1 && (board[r2][c2] == null))
+					res = true;
+				else
+					res = false;
+			}
+			// capture
+			else if ((board[r2][c2] != null) && (board[r2][c2].color == Colour.WHITE) && (r2 == (r1 + 1)) && (c2 == (c1 - 1) ||  c2 == (c1+1)))
+				res = true;
+			else
+				res = false;
+			
+			return res;
+		}
 	}
 
 }
