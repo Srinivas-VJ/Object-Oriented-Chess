@@ -16,12 +16,18 @@ import Pieces.King;
 import Pieces.Queen;
 import Pieces.Knight;
 import java.util.Date;
+import GameBoard.Board;
+import GameBoard.Player;
 
 public class testUI extends JPanel implements MouseListener, MouseMotionListener {
   Piece[][] board; 
   static int oldMouseX, oldMouseY, newMouseX, newMouseY;
   static int squareSize = 87;
+  Player player1, player2, currentPlayer;
   testUI() {
+    player1 = new Player(Colour.WHITE, "Player 1");
+    player2 = new Player(Colour.BLACK, "Player 2");
+    currentPlayer = player1;
     board = Board.getBoard(); 
     this.addMouseListener(this);
   }
@@ -144,12 +150,19 @@ public class testUI extends JPanel implements MouseListener, MouseMotionListener
     			newMouseX=e.getX()/squareSize;
     			newMouseY=e.getY()/squareSize;
           // make move here
-            Piece p;
-            p = board[oldMouseY][oldMouseX];
-            board[oldMouseY][oldMouseX] = null;
-            board[newMouseY][newMouseX] = p;
-            repaint();
-
+          boolean isMoveMade = Board.makeMove(oldMouseY, oldMouseX, newMouseY, newMouseX, currentPlayer);
+          if (isMoveMade) {
+            currentPlayer = currentPlayer.color == Colour.WHITE ? player2 : player1;
+          }
+          else
+          {
+            System.out.println("Invalid move");
+          }
+          oldMouseX = -1;
+          oldMouseY = -1;
+          newMouseX = -1;
+          newMouseY = -1;
+          repaint();
         }
       }
   }

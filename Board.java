@@ -1,3 +1,5 @@
+package GameBoard;
+
 import Pieces.Piece;
 import Pieces.Pawn;
 import Pieces.Colour;
@@ -13,12 +15,11 @@ public class Board {
 	private static boolean hasBeenInitialized = false;
 
 	//represent the actual game state 
-	static Piece game_board[][];
+	private static Piece game_board[][];
 	
 	// a temporary game state to test things
-	static Piece temp_board[][];
+	private static Piece temp_board[][];
 	
-
 	
 	private Board()
 	{
@@ -26,6 +27,47 @@ public class Board {
 		game_board = new Pieces.Piece[8][8];
 		initBoard(temp_board);
 		initBoard(game_board);
+	}
+
+	public static boolean makeMove(int r1, int c1, int r2, int c2, Player p)
+	{
+		//empty square
+		if (game_board[r1][c1] == null)
+		{
+			System.out.println("Input square cannot be empty");
+			return false;
+		}
+		
+		//not the right player
+		// System.out.println("Player: " + p.color);
+		// System.out.println("Piece: " + game_board[r1][c1].color);
+		// System.out.println(r1 + " " + c1);
+		if (game_board[r1][c1].color != p.color)
+		{
+			System.out.println("You cannot move the opponents piece silly");
+			return false;
+		}
+		
+		//not a valid move
+		if (game_board[r2][c2] != null && game_board[r2][c2].color == p.color)
+		{
+			System.out.println("You cannot self-sabotage just resign already");
+			return false;
+		}
+
+		//move the piece if valid move returned");		
+		if (game_board[r1][c1].isValidMove(r1, c1, r2, c2))
+		{
+			// do all complex logic here
+			System.out.println("attempting to move");
+			game_board[r2][c2] = game_board[r1][c1];
+			game_board[r1][c1] = null;
+			printBoard();
+			return true;
+		}
+
+		return false;
+			
 	}
 	
 	public static Piece[][] getBoard()
@@ -92,13 +134,13 @@ public class Board {
 		
 	}
 	
-	public void printBoard()
+	public static void printBoard()
 	{
 		for (int r = 0; r < 8; r++)
 		{
 			for (int c = 0; c < 8; c++)
 			{
-				Piece p = temp_board[r][c];
+				Piece p = game_board[r][c];
 				if (p == null)
 					System.out.print(" . ");
 				else

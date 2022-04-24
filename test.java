@@ -1,3 +1,4 @@
+
 import javax.swing.JFrame;
 
 public class test {
@@ -9,7 +10,6 @@ public class test {
 		f.setSize(700, 720);
 		f.setVisible(true);
 		f.repaint();
-		System.out.println("BOOM");
 	}
 
 }
