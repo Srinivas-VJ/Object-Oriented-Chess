@@ -9,6 +9,7 @@ import Pieces.Bishop;
 import Pieces.King;
 import Pieces.Queen;
 import Pieces.Knight;
+import User.Player;
 
 public class Board {
 	// singleton for board
@@ -29,7 +30,7 @@ public class Board {
 		initBoard(game_board);
 	}
 
-	public static boolean makeMove(int r1, int c1, int r2, int c2, Player p)
+	public static boolean makeMove(int r1, int c1, int r2, int c2, Colour player)
 	{
 		//empty square
 		if (game_board[r1][c1] == null)
@@ -42,14 +43,14 @@ public class Board {
 		// System.out.println("Player: " + p.color);
 		// System.out.println("Piece: " + game_board[r1][c1].color);
 		// System.out.println(r1 + " " + c1);
-		if (game_board[r1][c1].color != p.color)
+		if (game_board[r1][c1].color != player)
 		{
 			System.out.println("You cannot move the opponents piece silly");
 			return false;
 		}
 		
 		//not a valid move
-		if (game_board[r2][c2] != null && game_board[r2][c2].color == p.color)
+		if (game_board[r2][c2] != null && game_board[r2][c2].color == player)
 		{
 			System.out.println("You cannot self-sabotage just resign already");
 			return false;

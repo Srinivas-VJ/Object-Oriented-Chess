@@ -1,4 +1,4 @@
-package GameBoard;
+package User;
 import Pieces.Colour;
 
 public class Player

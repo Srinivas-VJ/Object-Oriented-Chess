@@ -17,17 +17,15 @@ import Pieces.Queen;
 import Pieces.Knight;
 import java.util.Date;
 import GameBoard.Board;
-import GameBoard.Player;
+// .Player;
 
 public class testUI extends JPanel implements MouseListener, MouseMotionListener {
   Piece[][] board; 
   static int oldMouseX, oldMouseY, newMouseX, newMouseY;
   static int squareSize = 87;
-  Player player1, player2, currentPlayer;
+  Colour currentPlayer;
   testUI() {
-    player1 = new Player(Colour.WHITE, "Player 1");
-    player2 = new Player(Colour.BLACK, "Player 2");
-    currentPlayer = player1;
+    currentPlayer = Colour.WHITE;
     board = Board.getBoard(); 
     this.addMouseListener(this);
   }
@@ -152,7 +150,7 @@ public class testUI extends JPanel implements MouseListener, MouseMotionListener
           // make move here
           boolean isMoveMade = Board.makeMove(oldMouseY, oldMouseX, newMouseY, newMouseX, currentPlayer);
           if (isMoveMade) {
-            currentPlayer = currentPlayer.color == Colour.WHITE ? player2 : player1;
+            currentPlayer = currentPlayer == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
           }
           else
           {
