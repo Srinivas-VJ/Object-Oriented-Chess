@@ -4,7 +4,8 @@
 
 ```
 javac -d . Colour.java Variant.java Piece.java Bishop.java King.java Knight.java Pawn.java Queen.java Rook.java
-javac -d . Board.java Player.java
+javac -d . Board.java 
+javac -d . Player.java
 ```
 
 ### Run the whole thing:-
