@@ -9,6 +9,7 @@ public class Queen extends Piece {
 	@Override
 	public boolean isValidMove(int r, int c, int x, int y) {
 		// TODO Auto-generated method stub
+		
 		Piece board[][] = Board.getBoard();
 		if (board[r][c].color == Colour.BLACK)
 		{
