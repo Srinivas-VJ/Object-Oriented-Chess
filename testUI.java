@@ -30,8 +30,9 @@ public class testUI extends JPanel implements MouseListener, MouseMotionListener
     this.addMouseListener(this);
   }
   public static void main(String args[]) {
-    System.out.print("Death ");
+    System.out.print("Let the game begin!");
   }
+  // renders the board    
   public void paintComponent(Graphics g) {
     super.paintComponent(g);
     for (int i = 0; i < 64; i += 2) {
@@ -123,6 +124,15 @@ public class testUI extends JPanel implements MouseListener, MouseMotionListener
 
   @Override
   public void mouseMoved(MouseEvent e) {
+    Image chessPiecesImage;
+    chessPiecesImage = new ImageIcon("pieces_resized.png").getImage();
+    int x, y, x1 = -1, y1 = -1;
+    if (e.getX() < 8 * squareSize && e.getY() < 8 * squareSize) { //if mouse is moved inside the chess board
+      newMouseX = e.getX();
+      newMouseY = e.getY();
+    }
+    
+    repaint();
   }
 
   @Override

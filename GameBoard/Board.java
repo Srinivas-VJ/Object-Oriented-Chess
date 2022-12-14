@@ -67,7 +67,11 @@ public class Board {
             } else {
                 player = player == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
                 if (playerHasValidMove(player))
+		{
                     player = player == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
+	            if (game_board[r2][c2].type == Variant.KING || game_board[r2][c2].type == Variant.ROOK) 
+			game_board[r2][c2].hasMoved = true;
+		}
                 return true;
             }
 
