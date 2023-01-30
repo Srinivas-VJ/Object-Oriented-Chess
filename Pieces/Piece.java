@@ -2,6 +2,7 @@ package Pieces;
 abstract public class Piece {
 	public Colour color;
 	public Variant type;
+	public boolean hasMoved = false;
 
 	public Piece(Colour color, Variant type)
 	{

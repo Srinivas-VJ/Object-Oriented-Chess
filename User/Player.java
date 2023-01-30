@@ -1,4 +1,5 @@
 package User;
+import Pieces.*;
 // make this about the user
 
 public class Player
