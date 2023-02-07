@@ -15,10 +15,12 @@ import java.util.List;
 public class Game {
     private Integer gameID;
     @NotBlank
-    private User playerWhite;
+    private String playerWhite;
 
     @NotBlank
-    private User playerBlack;
+    private String playerBlack;
+    // might need a different representation for color
+    private String currentPlayerColor = "white";
     private List<String> moves;
     private String status;
     private String description;
