@@ -18,9 +18,11 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="connect" class="btn btn-default" type="submit">Connect to game 1</button>
-                    <button id="connect1" class="btn btn-default" type="submit">Connect to game 2</button>
+                    <label for="connect">Enter game ID:</label>
+                    <input type="text" id="gameID" placeholder="Game ID here...">
+                    <input type="text" id="color" placeholder="Enter Player color...">
+
+                    <button id="connect" class="btn btn-default" type="submit">Connect to game</button>
                     <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
                     </button>
                 </div>
@@ -29,11 +31,11 @@
         <div class="col-md-6">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                    <label for="name">Enter from and to position</label>
+                    <input type="text" id="from" class="form-control" placeholder="initial position">
+                    <input type="text" id="to" class="form-control" placeholder="final position">
                 </div>
                 <button id="send" class="btn btn-default" type="submit">Send</button>
-                <button id="send1" class="btn btn-default" type="submit">Send to game 2</button>
             </form>
         </div>
     </div>
@@ -42,7 +44,7 @@
             <table id="conversation" class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Greetings</th>
+                    <th>Moves</th>
                 </tr>
                 </thead>
                 <tbody id="greetings">

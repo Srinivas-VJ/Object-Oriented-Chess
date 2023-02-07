@@ -1,9 +1,7 @@
 package com.example.chess.service;
 
 import com.example.chess.domain.Game;
-import com.example.chess.domain.User;
 import com.example.chess.exception.GameNotFoundException;
-import com.example.chess.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +18,7 @@ public class GameService {
         this.userService = userService;
     }
     private static List<Game> games = new ArrayList<Game>();
-    private void initGames() {
+    static {
             games.add(new Game(1, "srini", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
             games.add(new Game(2, "rahul", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
             games.add(new Game(3, "rahul", "srini", "white", new ArrayList<>(), "intialted", "fresh game"));
@@ -34,8 +32,6 @@ public class GameService {
         throw new GameNotFoundException();
     }
     public List<Game> getAllGames(){
-        if (games.size() == 0)
-            initGames();
         return games;
     }
 

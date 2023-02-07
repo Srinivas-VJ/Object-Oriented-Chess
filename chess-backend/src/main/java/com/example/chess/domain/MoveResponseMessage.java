@@ -10,4 +10,6 @@ import lombok.Setter;
 public class MoveResponseMessage {
     private String from;
     private String to;
+
+    private String color;
 }

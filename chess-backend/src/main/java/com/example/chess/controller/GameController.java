@@ -6,16 +6,15 @@ import com.example.chess.service.GameService;
 import com.example.chess.domain.Game;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController()
 public class GameController {
@@ -33,17 +32,19 @@ public class GameController {
     }
 
     @PostMapping("/game")
-    public ResponseEntity<Object> createGame(Game game) {
+    public ResponseEntity<Object> createGame(@RequestBody Game game) {
         gameService.addGame(game);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{gameId}").buildAndExpand(game.getGameID()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{gameID}").buildAndExpand(game.getGameID()).toUri();
         return ResponseEntity.created(location).build();
     }
     @MessageMapping("/move/{gameId}")
     @SendTo("/topic/move/{gameId}")
-    public MoveResponseMessage processMoveRequest(@PathVariable String gameId, MoveRequestMessage moveRequestMessage) throws Exception{
+    public MoveResponseMessage processMoveRequest(@DestinationVariable String gameId, MoveRequestMessage moveRequestMessage) throws Exception{
         // process the move here
         System.out.println("Game ID -> " + gameId);
-        return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo());
+        Game game = gameService.getGameByGameId(Integer.parseInt(gameId));
+        game.makeMove(moveRequestMessage.getFrom() + moveRequestMessage.getTo());
+        return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor());
     }
 }
 

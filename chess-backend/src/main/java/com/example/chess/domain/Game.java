@@ -25,7 +25,7 @@ public class Game {
     private String status;
     private String description;
 
-    private void makeMove(String move) {
+    public void makeMove(String move) {
         moves.add(move);
     }
 

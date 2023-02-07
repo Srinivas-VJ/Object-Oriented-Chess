@@ -18,18 +18,8 @@ function connect() {
     stompClient.connect({}, function (frame) {
         setConnected(true);
         console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/move/1', function (greeting) {
-            showGreeting(greeting.body)
-        });
-    });
-}
-function connect1() {
-    var socket = new SockJS('/gs-guide-websocket');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        setConnected(true);
-        console.log('Connected: ' + frame);
-        stompClient.subscribe('/topic/move/2', function (greeting) {
+        path = '/topic/move/' + $("#gameID").val()
+        stompClient.subscribe(path, function (greeting) {
             showGreeting(greeting.body)
         });
     });
@@ -44,10 +34,8 @@ function disconnect() {
 }
 
 function sendName() {
-    stompClient.send("/app/move/1", {}, JSON.stringify({'from': $("#name").val(), 'to' : 'to', 'color': 'black', 'gameId':'asdfa'}));
-}
-function sendName1() {
-    stompClient.send("/app/move/2", {}, JSON.stringify({'from': $("#name").val(), 'to' : 'to', 'color': 'black', 'gameId':'asdfa'}));
+    path = "/app/move/" + $("#gameID").val();
+    stompClient.send(path, {}, JSON.stringify({'from': $("#from").val(), 'to' : $("#to").val(), 'color': $("#color").val()}));
 }
 
 function showGreeting(message) {
