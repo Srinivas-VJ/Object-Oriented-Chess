@@ -17,6 +17,8 @@ import java.util.List;
 public class MainController {
     @Autowired
     UserService userService;
+    @Autowired
+    GameController gameMoveController;
 
     @GetMapping("/users")
     public List<User> getAllUsers() {
@@ -39,5 +41,4 @@ public class MainController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{userName}").buildAndExpand(user.getUserName()).toUri();
         return ResponseEntity.created(location).build();
     }
-
 }
