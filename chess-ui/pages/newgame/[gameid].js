@@ -27,16 +27,18 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
                 to: greeting.body.to,
                 promotion: "q", // always promote to a queen for example simplicity
               });
-              makeAMove(move);
+              onDrop(greeting.body.from, greeting.body.to);
             }
+            console.log("Manual make move method is callled should be called:)")
             console.log(`got response----------------------------------- ${greeting.body}`)
         });
     });
   }, []);
+  useEffect(() => {}, [game]);
 
 
   function makeAMove(move) {
-    console.log(move);
+    console.log('call to make a move');
     const gameCopy = new Chess();
     gameCopy.loadPgn(game.pgn());
     const result = gameCopy.move(move);
@@ -53,6 +55,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   }
 
   function onDrop(sourceSquare, targetSquare) {
+    console.log("call to on drop ")
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
@@ -60,7 +63,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     });
 
     let path = "/app/move/" + gameId;
-    stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor}));
+    stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor, 'fen' : game.fen()}));
     // illegal move
     if (move === null) return false;
     console.log(chess)

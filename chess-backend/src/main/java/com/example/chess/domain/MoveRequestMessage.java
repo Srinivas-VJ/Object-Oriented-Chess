@@ -14,4 +14,6 @@ public class MoveRequestMessage {
     // may need a different representation for color;
     private String color;
 
+    private String fen;
+
 }

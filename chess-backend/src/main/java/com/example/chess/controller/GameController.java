@@ -3,6 +3,9 @@ package com.example.chess.controller;
 import com.example.chess.domain.MoveRequestMessage;
 import com.example.chess.domain.MoveResponseMessage;
 import com.example.chess.exception.GameHasNoPlayerException;
+import com.example.chess.exception.InvalidMoveException;
+import com.example.chess.pieces.Board;
+import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
 import com.example.chess.domain.Game;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +58,13 @@ public class GameController {
     @SendTo("/topic/move/{gameId}")
     public MoveResponseMessage processMoveRequest(@DestinationVariable String gameId, MoveRequestMessage moveRequestMessage) throws Exception{
         // process the move here
-        System.out.println("Game ID -> " + gameId);
         Game game = gameService.getGameByGameId(gameId);
         game.makeMove(moveRequestMessage.getFrom() + moveRequestMessage.getTo());
-        return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor());
+        Board board = new Board(moveRequestMessage.getFen());
+        Colour player = moveRequestMessage.getColor().equals("white") ? Colour.WHITE : Colour.BLACK;
+        if (board.isMoveMakeable(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), player))
+            return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen());
+        throw new InvalidMoveException();
     }
 }
 
