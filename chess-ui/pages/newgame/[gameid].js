@@ -21,13 +21,15 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         console.log('Connected: ' + frame);
         var path = '/topic/move/' + gameId
         stompClient.subscribe(path, function (greeting) {
-            if (greeting.body.color == turn) {
-              const move = makeAMove({
-                from: greeting.body.from,
-                to: greeting.body.to,
+            const move = JSON.parse(greeting.body);
+            if (move.color == turn) {
+               makeAMove({
+                from: move.from,
+                to: move.to,
                 promotion: "q", // always promote to a queen for example simplicity
               });
-              onDrop(greeting.body.from, greeting.body.to);
+              // onDrop(move.from, move.to);
+              console.log("here")
             }
             console.log("Manual make move method is callled should be called:)")
             console.log(`got response----------------------------------- ${greeting.body}`)
@@ -55,7 +57,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    console.log("call to on drop ")
+    console.log("call to on drop " + sourceSquare + " "  + targetSquare)
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
