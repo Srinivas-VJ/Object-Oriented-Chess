@@ -6,7 +6,7 @@ const Game = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = await axios.get("http://localhost:8080/game");
+      const result = await axios.get("/api/game");
       console.log(result.data);
       setGames(result.data);
     };

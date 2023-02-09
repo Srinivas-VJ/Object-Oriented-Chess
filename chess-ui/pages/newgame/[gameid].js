@@ -1,96 +1,104 @@
-import React, { useState } from "react";
-import { kingWhite, queenWhite, rookWhite, bishopWhite, knightWhite, pawnWhite, kingBlack, queenBlack, rookBlack, bishopBlack, knightBlack, pawnBlack } from "./pieces.js";
+import { useState , useEffect} from "react";
+import  {useRouter} from 'next/router';
+import {Chess} from 'chess.js'
+import { Chessboard } from "react-chessboard";
+import { SERVER_ENDPOINT } from "../../config";
 
-const ChessBoard = (player1, player2, gameId) => {
-	const initialBoard = [
-		["R", "N", "B", "Q", "K", "B", "N", "R"],
-		["P", "P", "P", "P", "P", "P", "P", "P"],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		[" ", " ", " ", " ", " ", " ", " ", " "],
-		["p", "p", "p", "p", "p", "p", "p", "p"],
-		["r", "n", "b", "q", "k", "b", "n", "r"]
-	      ];
-  const [squares, setSquares] = useState(initialBoard);
 
-  const handleSquareClick = (i) => {
-    const squaresCopy = squares.slice();
-    squaresCopy[i] = "X";
-    setSquares(squaresCopy);
-  };
+const chess = new Chess();
+var stompClient = null;
+export default function PlayGame(player1, player2, gameId, playerColor) {
+  const [game, setGame] = useState(chess);
+  const [turn, setTurn] = useState("white");
+  const router = useRouter();
+  gameId = router.query.gameid;
+  playerColor = router.query.currentPlayerColor;
 
-  const renderSquare = (i) => {
-    let piece = null;
+  useEffect(() => {
+    var socket = new SockJS(SERVER_ENDPOINT + '/gs-guide-websocket');
+    stompClient = Stomp.over(socket);
+    stompClient.connect({}, function (frame) {
+        console.log('Connected: ' + frame);
+        var path = '/topic/move/' + gameId
+        stompClient.subscribe(path, function (greeting) {
+            if (greeting.body.color == turn) {
+              const move = makeAMove({
+                from: greeting.body.from,
+                to: greeting.body.to,
+                promotion: "q", // always promote to a queen for example simplicity
+              });
+              makeAMove(move);
+            }
+            console.log(`got response----------------------------------- ${greeting.body}`)
+        });
+    });
+  }, []);
 
-    switch (squares[i]) {
-      case "K":
-        piece = kingWhite;
-        break;
-      case "Q":
-        piece = queenWhite;
-        break;
-      case "R":
-        piece = rookWhite;
-        break;
-      case "B":
-        piece = bishopWhite;
-        break;
-      case "N":
-        piece = knightWhite;
-        break;
-      case "P":
-        piece = pawnWhite;
-        break;
-      case "k":
-        piece = kingBlack;
-        break;
-      case "q":
-        piece = queenBlack;
-        break;
-      case "r":
-        piece = rookBlack;
-        break;
-      case "b":
-        piece = bishopBlack;
-        break;
-      case "n":
-        piece = knightBlack;
-        break;
-      case "p":
-        piece = pawnBlack;
-        break;
-      default:
-        piece = null;
-    }
 
-    return (
-      <button className="square" onClick={() => handleSquareClick(i)}>
-        {piece && <img src={piece} alt={squares[i]} />}
-      </button>
-    );
-  };
+  function makeAMove(move) {
+    console.log(move);
+    const gameCopy = new Chess();
+    gameCopy.loadPgn(game.pgn());
+    const result = gameCopy.move(move);
+    setGame(gameCopy);
+    setTurn(turn == "white" ? "black" : "white");
+    return result; // null if the move was illegal, the move object if the move was legal
+  }
 
-  return (
-    <div>
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((row) => (
-        <div className="board-row">
-          {[0, 1, 2, 3, 4, 5, 6, 7].map((col) => renderSquare(row * 8 + col))}
-        </div>
-      ))}
-    </div>
-  );
+  function makeRandomMove() {
+    const possibleMoves = game.moves();
+    if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return; // exit if the game is over
+    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
+    makeAMove(possibleMoves[randomIndex]);
+  }
+
+  function onDrop(sourceSquare, targetSquare) {
+    const move = makeAMove({
+      from: sourceSquare,
+      to: targetSquare,
+      promotion: "q", // always promote to a queen for example simplicity
+    });
+
+    let path = "/app/move/" + gameId;
+    stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor}));
+    // illegal move
+    if (move === null) return false;
+    console.log(chess)
+    return true;
+  }
+
+  return (<div style={{width:  "750px", border: "13px solid white", padding: "10px", alignContent: "center", justifyContent: "center", alignItems: "center", justifyItems: "center"}}>
+    <Chessboard 
+        alignContent = "center"
+        position={game.fen()} 
+        onPieceDrop={onDrop} 
+        boardOrientation={"white"} 
+        // customDarkSquareStyle={{ borderRadius: '5px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 '}}
+        customPieces = {
+          { bK: ({squareWidth="32px"}) => <div style={{fontSize: "10px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Chess_kdt45.svg/90px-Chess_kdt45.svg.png"></img></div> ,
+            wP: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Chess_plt45.svg/90px-Chess_plt45.svg.png"></img></div>,
+            bP: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Chess_pdt45.svg/90px-Chess_pdt45.svg.png"></img></div>,
+            wN: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Chess_nlt45.svg/90px-Chess_nlt45.svg.png"></img></div>,
+            bN: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Chess_ndt45.svg/90px-Chess_ndt45.svg.png"></img></div> ,
+            bR: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Chess_rdt45.svg/90px-Chess_rdt45.svg.png"></img></div> ,
+            wR: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Chess_rlt45.svg/90px-Chess_rlt45.svg.png"></img></div> ,
+            bB: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Chess_bdt45.svg/90px-Chess_bdt45.svg.png"></img></div> ,
+            wB: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Chess_blt45.svg/90px-Chess_blt45.svg.png"></img></div> ,
+            wQ: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Chess_qlt45.svg/90px-Chess_qlt45.svg.png"></img></div> ,
+            bQ: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Chess_qdt45.svg/90px-Chess_qdt45.svg.png"></img></div> ,
+            wK: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Chess_klt45.svg/90px-Chess_klt45.svg.png"></img></div> ,
+        }
+        }
+        />;
+  </div>)
+  
+}
+PlayGame.getInitialProps = async ({ query }) => {
+  const player1 = query.player1;
+  const player2 = query.player2;
+  const gameid = query.gameid;
+  const playerColor = query.currentPlayerColor;
+  return { player1, player2, gameid, playerColor };
 };
 
 
-
-      
-      ChessBoard.getInitialProps = async ({ query }) => {
-	return {
-	  player1: query.player1,
-	  player2: query.player2,
-	  gameId: query.gameId,
-	};
-      };
-      
-      export default ChessBoard;

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { SERVER_ENDPOINT } from "../../config";
 
 
 const GamePage = () => {
-	const URL = "http://localhost:8080/game"
+	const URL = SERVER_ENDPOINT +  "/game";
 	const [player1, setPlayer1] = useState("");
 	const [player2, setPlayer2] = useState("");
 	const [gameId, setGameId] = useState("");
+	const [currentPlayerColor, setCurrentPlayerColor] = useState("white");
 	const router = useRouter();
       
-	const handleStartGame =  () => {
-		const response = axios.post(URL, {
-			"gameID": gameId,
+	const handleStartGame = async () => {
+		const response = await axios.post(URL, {
 			"playerWhite": player1,
 			"playerBlack": player2,
 			"currentPlayerColor": "white",
@@ -21,8 +22,8 @@ const GamePage = () => {
 			"description": "fresh game"
 		    });
 	  router.push({
-	    pathname: `/newgame/${gameId}`,
-	    query: { player1, player2, gameId },
+	    pathname: `/newgame/${response.data}`,
+	    query: { player1, player2, gameId, currentPlayerColor },
 	  });
 	};
       
@@ -48,14 +49,14 @@ const GamePage = () => {
 		  onChange={(e) => setPlayer2(e.target.value)}
 		/>
 	      </div>
+		  <div className="form-group">
+		  <label htmlfor="currentPlayerColor">Play as :</label>
+			<select name="colors" id="color" onChange={(e) => setCurrentPlayerColor(e.target.value)}>
+			<option value="white">WHITE</option>
+			<option value="black">BLACK</option>
+			</select>
+	      </div>
 	      <div className="form-group">
-		<label htmlFor="gameId">Game ID:</label>
-		<input
-		  type="text"
-		  id="gameId"
-		  value={gameId}
-		  onChange={(e) => setGameId(e.target.value)}
-		/>
 	      </div>
 	      <button type="button" onClick={handleStartGame}>
 		Start Game

@@ -1,6 +1,7 @@
 package com.example.chess.domain;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Game {
-    private Integer gameID;
-    @NotBlank
+    private String gameID;
     private String playerWhite;
 
-    @NotBlank
     private String playerBlack;
     // might need a different representation for color
     private String currentPlayerColor = "white";

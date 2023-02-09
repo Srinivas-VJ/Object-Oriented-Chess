@@ -19,15 +19,15 @@ public class GameService {
     }
     private static List<Game> games = new ArrayList<Game>();
     static {
-            games.add(new Game(1, "srini", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
-            games.add(new Game(2, "rahul", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
-            games.add(new Game(3, "rahul", "srini", "white", new ArrayList<>(), "intialted", "fresh game"));
-            games.add(new Game(4, "srini", "rahul", "white", new ArrayList<>(), "intialted", "fresh game"));
+            games.add(new Game("1", "srini", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
+            games.add(new Game("2", "rahul", "ratna", "white", new ArrayList<>(), "intialted", "fresh game"));
+            games.add(new Game("3", "rahul", "srini", "white", new ArrayList<>(), "intialted", "fresh game"));
+            games.add(new Game("4", "srini", "rahul", "white", new ArrayList<>(), "intialted", "fresh game"));
     }
 
-    public Game getGameByGameId(Integer gameId) {
+    public Game getGameByGameId(String gameId) {
         for (Game game : games)
-            if (Objects.equals(game.getGameID(), gameId))
+            if (game.getGameID().equals(gameId))
                 return  game;
         throw new GameNotFoundException();
     }
