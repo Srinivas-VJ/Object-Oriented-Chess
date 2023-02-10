@@ -29,18 +29,14 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         stompClient.subscribe(path, function (greeting) {
             const move = JSON.parse(greeting.body);
             console.log(`move from queue color - ${move.color}  and player is ${playerColor}`)
-            if (move.color == playerColor)
-                return;
             if (move.color != playerColor) {
-          
                makeAMove({
                 from: move.from,
                 to: move.to,
                 promotion: "q", // always promote to a queen for example simplicity
               }, move.fen);
-              console.log("here")
+
             }
-            console.log("Manual make move method is callled should be called:)")
             console.log(`got response----------------------------------- ${greeting.body}`)
         });
     });
@@ -50,18 +46,10 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 
 
   function makeAMove(move, fen) {
-    console.log('call to make a move');
-    // const result = game.move(move);
-    // setGame(game);
-    // setTurn(turn == 'white' ? 'black' : 'white')
     const gameCopy = new Chess();
     gameCopy.load(fen)
-    console.log(gameCopy.ascii())
-    // gameCopy.loadPgn(game.pgn());
     const result = gameCopy.move(move);
-    console.log(result);
     setGame(gameCopy);
-    console.log(gameCopy.ascii())
     return result; // null if the move was illegal, the move object if the move was legal
   }
 
@@ -73,13 +61,14 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   }
 
   function onDrop(sourceSquare, targetSquare) {
+    if (game.get(from).color != playerColor)
+        return false;
     console.log("call to on drop " + sourceSquare + " "  + targetSquare)
     const move = makeAMove({
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for example simplicity
     }, game.fen());
-
     let path = "/app/move/" + gameId;
     stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor, 'fen' : game.fen()}));
     // illegal move
