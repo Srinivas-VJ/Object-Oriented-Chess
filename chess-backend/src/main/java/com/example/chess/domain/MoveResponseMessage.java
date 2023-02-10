@@ -14,4 +14,8 @@ public class MoveResponseMessage {
     private String color;
 
     private String fen;
+
+    private String status;
+
+    private String message;
 }

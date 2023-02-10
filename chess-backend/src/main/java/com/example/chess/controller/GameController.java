@@ -62,9 +62,24 @@ public class GameController {
         game.makeMove(moveRequestMessage.getFrom() + moveRequestMessage.getTo());
         Board board = new Board(moveRequestMessage.getFen());
         Colour player = moveRequestMessage.getColor().equals("white") ? Colour.WHITE : Colour.BLACK;
-        if (board.isMoveMakeable(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), player))
-            return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen());
-        throw new InvalidMoveException();
+        int status = board.getMoveStatus(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), player, moveRequestMessage.getFen());
+        switch (status) {
+            case 0 -> {
+                return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game");
+            }
+            case -1 ->  {
+                throw new InvalidMoveException();
+            }
+            case 1 -> {
+                // end game procedure
+                return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", moveRequestMessage.getColor() + " wins by Checkmate");
+            }
+            case 2 -> {
+                // end game procedure
+                return new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate");
+            }
+            default -> throw new InvalidMoveException();
+        }
     }
 }
 

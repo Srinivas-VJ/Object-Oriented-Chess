@@ -50,18 +50,22 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     gameCopy.load(fen)
     const result = gameCopy.move(move);
     setGame(gameCopy);
+    if (result != null)
+      setTurn(turn == "white" ? "black" : "white");
     return result; // null if the move was illegal, the move object if the move was legal
   }
 
   function makeRandomMove() {
     const possibleMoves = game.moves();
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0) return; // exit if the game is over
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0) return; // exit if the game is over
     const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeAMove(possibleMoves[randomIndex]);
+    makeAMove(possibleMoves[randomIndex], game.fen());
+    var path = '/topic/move/' + gameId
+    stompClient.send(path, {}, JSON.stringify({'from': possibleMoves[randomIndex].from, 'to' : possibleMoves[randomIndex].from , 'color': playerColor == "white" ? "black" : "white" , 'fen' : game.fen()}));
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    if (game.get(from).color != playerColor)
+    if (game.get(sourceSquare).color != playerColor[0])
         return false;
     console.log("call to on drop " + sourceSquare + " "  + targetSquare)
     const move = makeAMove({
@@ -73,17 +77,18 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor, 'fen' : game.fen()}));
     // illegal move
     if (move === null) return false;
+    // makeRandomMove();
     console.log(chess)
     return true;
   }
 
   return (<div style={{width:"700px"}}>
-    {/* <span> Current player turn : {turn}</span> */}
+    <span> Current player turn : {turn} </span>
     <Chessboard 
         alignContent = "center"
         position={game.fen()} 
         onPieceDrop={onDrop} 
-        boardOrientation={"white"} 
+        boardOrientation={playerColor} 
         // customDarkSquareStyle={{ borderRadius: '5px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 '}}
         customPieces = {
           { bK: ({squareWidth="32px"}) => <div style={{fontSize: "10px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Chess_kdt45.svg/90px-Chess_kdt45.svg.png"></img></div> ,

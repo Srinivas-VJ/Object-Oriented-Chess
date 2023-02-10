@@ -59,12 +59,43 @@ public class Board {
         return ;
     }
 
-    public boolean isMoveMakeable(String from, String to, Colour player) {
+    public int getMoveStatus(String from, String to, Colour player, String fen) {
         int r1 = '8' - from.charAt(1);
         int c1 = from.charAt(0) - 'a';
         int r2 = '8' - to.charAt(1);
         int c2 = to.charAt(0) - 'a';
-        return makeMove(r1, c1, r2, c2, player);
+        if (makeMove(r1, c1, r2, c2, player)) {
+            // check if game is over
+            Colour opponent = player == Colour.BLACK ? Colour.WHITE : Colour.BLACK;
+            if (playerHasValidMove(opponent))
+                return 0;
+            if (isKingInCheck(game_board, opponent))
+                return 1; // code for checkmate
+            return 2; // code for stalemate
+        }
+        else {
+            // check if castling
+            String castle = fen.split(" ")[2];
+            // white
+            if (r1 == 7 && c1 == 4 && player.equals(Colour.WHITE)) {
+                // queen side
+                if (r2 == 7 && c2 == 2 && castle.contains("Q"))
+                    return 0;
+                // king side
+                if (r2 == 7 && c2 == 6 && castle.contains("K"))
+                    return 0;
+            }
+            // black
+            else if (r1 == 0 && c1 == 4 && player.equals(Colour.BLACK)) {
+                // queen side
+                if (r2 == 0 && c2 == 2 && castle.contains("q"))
+                    return 0;
+                // king side
+                if (r2 == 0 && c2 == 6 && castle.contains("k"))
+                    return 0;
+            }
+            return -1;
+        }
     }
 
     public boolean makeMove(int r1, int c1, int r2, int c2, Colour player) {
@@ -202,6 +233,8 @@ public class Board {
                     }
             }
         }
+        /*
+        legacy code :(
         if (isKingInCheck(board, Player)) {
             System.out.println("Checkmate");
             System.exit(0);
@@ -209,6 +242,7 @@ public class Board {
             System.out.println("Stalemate");
             System.exit(0);
         }
+        */
         return false;
     }
 
