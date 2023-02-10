@@ -8,10 +8,12 @@ import { SERVER_ENDPOINT } from "../../config";
 const chess = new Chess();
 var stompClient = null;
 var called = false;
+
 export default function PlayGame(player1, player2, gameId, playerColor) {
   const [game, setGame] = useState(chess);
   const [turn, setTurn] = useState("white");
   const router = useRouter();
+
   gameId = router.query.gameid;
   playerColor = router.query.currentPlayerColor;
 
@@ -26,33 +28,40 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         var path = '/topic/move/' + gameId
         stompClient.subscribe(path, function (greeting) {
             const move = JSON.parse(greeting.body);
-            console.log(move.color , turn , "                    ")
-            if (move.color == turn) {
+            console.log(`move from queue color - ${move.color}  and player is ${playerColor}`)
+            if (move.color == playerColor)
+                return;
+            if (move.color != playerColor) {
+          
                makeAMove({
                 from: move.from,
                 to: move.to,
                 promotion: "q", // always promote to a queen for example simplicity
-              });
-              // onDrop(move.from, move.to);
+              }, move.fen);
               console.log("here")
             }
             console.log("Manual make move method is callled should be called:)")
             console.log(`got response----------------------------------- ${greeting.body}`)
         });
     });
-    console.log('i got called once')
   }, []);
 
   useEffect(() => {}, [turn]);
 
 
-  function makeAMove(move) {
+  function makeAMove(move, fen) {
     console.log('call to make a move');
+    // const result = game.move(move);
+    // setGame(game);
+    // setTurn(turn == 'white' ? 'black' : 'white')
     const gameCopy = new Chess();
-    gameCopy.loadPgn(game.pgn());
+    gameCopy.load(fen)
+    console.log(gameCopy.ascii())
+    // gameCopy.loadPgn(game.pgn());
     const result = gameCopy.move(move);
+    console.log(result);
     setGame(gameCopy);
-    setTurn(turn == "white" ? "black" : "white");
+    console.log(gameCopy.ascii())
     return result; // null if the move was illegal, the move object if the move was legal
   }
 
@@ -69,7 +78,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for example simplicity
-    });
+    }, game.fen());
 
     let path = "/app/move/" + gameId;
     stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor, 'fen' : game.fen()}));
@@ -79,8 +88,8 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     return true;
   }
 
-  return (<div>
-    <span> Current player turn : {turn}</span>
+  return (<div style={{width:"700px"}}>
+    {/* <span> Current player turn : {turn}</span> */}
     <Chessboard 
         alignContent = "center"
         position={game.fen()} 
