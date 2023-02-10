@@ -50,7 +50,7 @@ const GamePage = () => {
 		/>
 	      </div>
 		  <div className="form-group">
-		  <label htmlfor="currentPlayerColor">Play as :</label>
+		  <label htmlFor="currentPlayerColor">Play as :</label>
 			<select name="colors" id="color" onChange={(e) => setCurrentPlayerColor(e.target.value)}>
 			<option value="white">WHITE</option>
 			<option value="black">BLACK</option>

@@ -36,7 +36,8 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         });
     });
   }, []);
-  useEffect(() => {}, [game]);
+
+  useEffect(() => {}, [game, turn]);
 
 
   function makeAMove(move) {
@@ -73,6 +74,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   }
 
   return (<div style={{width:  "750px", border: "13px solid white", padding: "10px", alignContent: "center", justifyContent: "center", alignItems: "center", justifyItems: "center"}}>
+    <span> Current player turn : {turn}</span>
     <Chessboard 
         alignContent = "center"
         position={game.fen()} 
@@ -94,7 +96,8 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
             wK: ({squareWidth="32px"}) => <div style={{fontSize: "90px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Chess_klt45.svg/90px-Chess_klt45.svg.png"></img></div> ,
         }
         }
-        />;
+        />
+
   </div>)
   
 }
