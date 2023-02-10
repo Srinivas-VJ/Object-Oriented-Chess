@@ -7,6 +7,7 @@ import { SERVER_ENDPOINT } from "../../config";
 
 const chess = new Chess();
 var stompClient = null;
+var called = false;
 export default function PlayGame(player1, player2, gameId, playerColor) {
   const [game, setGame] = useState(chess);
   const [turn, setTurn] = useState("white");
@@ -15,6 +16,9 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   playerColor = router.query.currentPlayerColor;
 
   useEffect(() => {
+    if (called)
+      return;
+    called = true;
     var socket = new SockJS(SERVER_ENDPOINT + '/gs-guide-websocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
@@ -22,6 +26,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         var path = '/topic/move/' + gameId
         stompClient.subscribe(path, function (greeting) {
             const move = JSON.parse(greeting.body);
+            console.log(move.color , turn , "                    ")
             if (move.color == turn) {
                makeAMove({
                 from: move.from,
@@ -35,9 +40,10 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
             console.log(`got response----------------------------------- ${greeting.body}`)
         });
     });
+    console.log('i got called once')
   }, []);
 
-  useEffect(() => {}, [game, turn]);
+  useEffect(() => {}, [turn]);
 
 
   function makeAMove(move) {
@@ -73,7 +79,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     return true;
   }
 
-  return (<div style={{width:  "750px", border: "13px solid white", padding: "10px", alignContent: "center", justifyContent: "center", alignItems: "center", justifyItems: "center"}}>
+  return (<div>
     <span> Current player turn : {turn}</span>
     <Chessboard 
         alignContent = "center"
