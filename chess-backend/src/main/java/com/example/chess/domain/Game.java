@@ -1,5 +1,7 @@
 package com.example.chess.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -13,7 +15,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 public class Game {
+    @Id
     private String gameID;
     private String playerWhite;
 

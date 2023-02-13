@@ -9,6 +9,7 @@ import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
 import com.example.chess.domain.Game;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -22,7 +23,6 @@ import java.security.Timestamp;
 import java.util.*;
 
 @RestController()
-@CrossOrigin(origins = "http://localhost:3000")
 public class GameController {
 
     @Autowired

@@ -18,36 +18,40 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   playerColor = router.query.currentPlayerColor;
 
   useEffect(() => {
-    if (called)
-      return;
+    if (called) return;
     called = true;
-    var socket = new SockJS(SERVER_ENDPOINT + '/gs-guide-websocket');
+    var socket = new SockJS(SERVER_ENDPOINT + "/gs-guide-websocket");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        console.log('Connected: ' + frame);
-        var path = '/topic/move/' + gameId
-        stompClient.subscribe(path, function (greeting) {
-            const move = JSON.parse(greeting.body);
-            console.log(`move from queue color - ${move.color}  and player is ${playerColor}`)
-            if (move.color != playerColor) {
-               makeAMove({
-                from: move.from,
-                to: move.to,
-                promotion: "q", // always promote to a queen for example simplicity
-              }, move.fen);
-
-            }
-            console.log(`got response----------------------------------- ${greeting.body}`)
-        });
+      console.log("Connected: " + frame);
+      var path = "/topic/move/" + gameId;
+      stompClient.subscribe(path, function (greeting) {
+        const move = JSON.parse(greeting.body);
+        console.log(
+          `move from queue color - ${move.color}  and player is ${playerColor}`
+        );
+        if (move.color != playerColor) {
+          makeAMove(
+            {
+              from: move.from,
+              to: move.to,
+              promotion: "q", // always promote to a queen for example simplicity
+            },
+            move.fen
+          );
+        }
+        console.log(
+          `got response----------------------------------- ${greeting.body}`
+        );
+      });
     });
   }, []);
 
   useEffect(() => {}, [turn]);
 
-
   function makeAMove(move, fen) {
     const gameCopy = new Chess();
-    gameCopy.load(fen)
+    gameCopy.load(fen);
     const result = gameCopy.move(move);
     setGame(gameCopy);
     if (result != null)
@@ -74,21 +78,29 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
       promotion: "q", // always promote to a queen for example simplicity
     }, game.fen());
     let path = "/app/move/" + gameId;
-    stompClient.send(path, {}, JSON.stringify({'from': sourceSquare, 'to' : targetSquare, 'color': playerColor, 'fen' : game.fen()}));
+    stompClient.send(
+      path,
+      {},
+      JSON.stringify({
+        from: sourceSquare,
+        to: targetSquare,
+        color: playerColor,
+        fen: game.fen(),
+      })
+    );
     // illegal move
     if (move === null) return false;
-    // makeRandomMove();
     console.log(chess)
     return true;
   }
 
   return (<div style={{width:"700px"}}>
     <span> Current player turn : {turn} </span>
-    <Chessboard 
+    <Chessboard
         alignContent = "center"
-        position={game.fen()} 
-        onPieceDrop={onDrop} 
-        boardOrientation={playerColor} 
+        position={game.fen()}
+        onPieceDrop={onDrop}
+        boardOrientation={playerColor}
         // customDarkSquareStyle={{ borderRadius: '5px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 '}}
         customPieces = {
           { bK: ({squareWidth="32px"}) => <div style={{fontSize: "10px"}}><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Chess_kdt45.svg/90px-Chess_kdt45.svg.png"></img></div> ,
