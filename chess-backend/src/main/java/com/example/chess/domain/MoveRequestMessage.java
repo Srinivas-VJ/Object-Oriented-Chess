@@ -10,10 +10,7 @@ import lombok.Setter;
 public class MoveRequestMessage {
     private String from;
     private String to;
-
-    // may need a different representation for color;
     private String color;
-
     private String fen;
 
 }

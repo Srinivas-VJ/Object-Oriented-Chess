@@ -6,20 +6,16 @@ import com.example.chess.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class GameService {
 
-    private UserService userService;
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
     @Autowired
     public GameService( UserService userService, GameRepository gameRepository) {
         this.gameRepository = gameRepository;
-        this.userService = userService;
     }
 
     public Game getGameByGameId(String gameId) {
@@ -37,5 +33,7 @@ public class GameService {
     }
 
 
-
+    public void updateGame(Game game) {
+        gameRepository.save(game);
+    }
 }

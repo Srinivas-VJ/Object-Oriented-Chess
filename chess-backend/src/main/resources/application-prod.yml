@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: url
+    username: username
+    password: password
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: <ID>
+            clientSecret: <Secret>
+          github:
+            clientId: <ID>
+            clientSecret: <Secret>
+frontend:
+  url : "http://localhost:3000"
+
+encryption:
+  secret: ""

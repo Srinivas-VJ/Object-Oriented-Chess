@@ -4,21 +4,18 @@ import com.example.chess.domain.User;
 import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements Serializable {
     @Autowired
     private UserRepository userRepository;
     public List<User> getAllUser(){
-        return userRepository.findAll();
+        return (List<User>) userRepository.findAll();
     }
 
     public User getUserByUserName(String userName){
@@ -40,5 +37,9 @@ public class UserService {
         User deletedUser = user.get();
         userRepository.deleteById(userName);
         return deletedUser;
+    }
+
+    public void updateUser(User player) {
+        userRepository.save(player);
     }
 }

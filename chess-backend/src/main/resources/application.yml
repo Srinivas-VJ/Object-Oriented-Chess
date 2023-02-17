@@ -1,25 +1,20 @@
-spring:
-  devtools:
-    livereload:
-      enabled: false
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/chess_dev
-    username: root
-    password: password
-
-  jpa:
-    hibernate.ddl-auto: update
-    generate-ddl: true
-    show-sql: true
 
 management:
+  security:
+    enabled: false
   endpoints:
-    config-props:
-      keys-to-sanitize: password
     web:
       exposure:
         include: "*"
       cors:
         allowed-origins: http://localhost:3000
         allowed-methods: GET ,POST
+
+spring:
+  devtools:
+    livereload:
+      enabled: false
+  profiles:
+    active: prod
+
+
