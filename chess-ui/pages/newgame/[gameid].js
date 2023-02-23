@@ -30,12 +30,6 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 	const [turn, setTurn] = useState("white");
 	const [visible, setVisible] = useState(false);
 	const router = useRouter();
-	const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJyYXRuYSIsImlhdCI6MTY3NjYxMjQyMywiZXhwIjoxNjc2NjU1NjIzfQ.Hn8Wr4qTqvCt80cnmPCQF4aH6PEtaLXK7XERaXcROC8"
-	const config = {
-		headers: {
-			Authorization: `Bearer ${token}`
-		}
-	};
 	const handleOk = () => {
 		setVisible(false);
 		router.push("/game");
@@ -75,6 +69,8 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     .then( res => {
       console.log("Fetching fen from backend");
       const  gameCopy = new Chess();
+	  console.log(res);
+	  console.log(res.data);
       gameCopy.load(res.data);
       setGame(gameCopy);
       if (res.data.split()[1] == "w" ? setTurn("white") : setTurn("black"));
@@ -92,11 +88,9 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 		const result = gameCopy.move(move);
 		setGame(gameCopy);
 		const tempTurn = fen.split(" ")[1];
-		console.log(tempTurn + "   --------------------------------------------------------  ");
 		if (result != null) {
 
 			setTurn(tempTurn == "w" ? "black" : "white");
-
 			let path = "/app/move/" + gameId;
 			axios.put(SERVER_ENDPOINT + "/move/" + gameId, {
 						"from": move.from,
@@ -104,7 +98,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 						"color": playerColor,
 						"fen": game.fen(),
 					},
-					config
+					// config
 				)
 				.then(res => {
           console.log(res)
@@ -114,7 +108,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 						"color": playerColor,
 						"fen": gameCopy.fen(),
 					},
-					config
+					// config
 				)
 				.then(res => console.log(res))
 				.catch(err => console.log(err));

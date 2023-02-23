@@ -19,8 +19,8 @@ public class CustomUserDetailsService implements UserDetailsService, Serializabl
 
     @Override
     @Transactional
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepo.findByUsername(username);
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<User> user = userRepo.findByUserEmail(email);
         if (user.isEmpty())
             throw new UsernameNotFoundException("User not found");
         return user.get();

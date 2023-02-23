@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final UserRepository userRepo;
-//    private final PasswordEncoder passwordEncoder;
 
     private final AuthenticationService authenticationService;
 

@@ -7,7 +7,6 @@ import com.example.chess.domain.User;
 import com.example.chess.exception.GameHasNoPlayerException;
 import com.example.chess.exception.GameNotFoundException;
 import com.example.chess.exception.InvalidMoveException;
-import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.pieces.Board;
 import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
@@ -50,7 +49,7 @@ public class GameController {
     }
     @GetMapping("/game/{gameId}/getFen")
     public ResponseEntity<String> getGameState(@PathVariable String gameId) {
-        if (gameStates.containsKey(gameId)) {
+        if (gameStates.containsKey(gameId) && gameStates.get(gameId).length() != 0) {
            return ResponseEntity.ok(gameStates.get(gameId));
         }
         return ResponseEntity.ok("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
@@ -79,10 +78,10 @@ public class GameController {
         if (game.getPlayerBlack() ==  null || game.getPlayerWhite() == null)
             throw new GameHasNoPlayerException();
 
-        var user1  = userService.getUserByUserName(game.getPlayerBlack());
-        var user2  = userService.getUserByUserName(game.getPlayerWhite());
-        if (user1 == null || user2  == null)
-            throw new UserNotFoundException();
+//        var user1  = userService.getUserByUserName(game.getPlayerBlack());
+//        var user2  = userService.getUserByUserName(game.getPlayerWhite());
+//        if (user1 == null || user2  == null)
+//            throw new UserNotFoundException();
 
         String message = game.getPlayerBlack() + game.getPlayerWhite();
         message +=  new Date().getTime();

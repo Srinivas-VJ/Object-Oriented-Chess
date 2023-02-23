@@ -1,12 +1,12 @@
 package com.example.chess.service;
 
+import com.example.chess.domain.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -29,13 +29,13 @@ public class JwtService {
         final Claims claims = extractAllClaims(jwtToken);
         return claimsResolver.apply(claims);
     }
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public boolean isTokenValid(String jwtToken , UserDetails userDetails) {
+    public boolean isTokenValid(String jwtToken , User userDetails) {
         final String username = extractUserName(jwtToken);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(jwtToken);
+        return username.equals(userDetails.getUserEmail()) && !isTokenExpired(jwtToken);
     }
 
     private boolean isTokenExpired(String jwtToken) {
@@ -46,11 +46,11 @@ public class JwtService {
         return extractClaim(jwtToken, Claims::getExpiration);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, User userDetails) {
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(userDetails.getUserEmail())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 // setting for 30 days
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 *  24 * 30))

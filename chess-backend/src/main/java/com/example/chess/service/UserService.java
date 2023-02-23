@@ -1,6 +1,7 @@
 package com.example.chess.service;
 
 import com.example.chess.domain.User;
+import com.example.chess.exception.UserAlreadyExistsException;
 import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,17 @@ public class UserService implements Serializable {
        throw new UserNotFoundException();
     }
 
+    public User getUserByEmail(String email) {
+        Optional<User> user = userRepository.findByUserEmail(email);
+        if (user.isPresent())
+            return user.get();
+        throw new UserNotFoundException();
+    }
+
     public User addUser(User user) {
+        Optional<User> tempUser = userRepository.findById(user.getUsername());
+        if (tempUser.isPresent())
+            throw new UserAlreadyExistsException();
         userRepository.save(user);
         return user;
     }

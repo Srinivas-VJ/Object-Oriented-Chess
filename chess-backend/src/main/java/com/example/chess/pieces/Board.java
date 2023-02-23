@@ -12,14 +12,9 @@ public class Board {
     //represent the actual game state
     private Piece[][] game_board;
 
-    // a temporary game state to test things
-    private Piece[][] temp_board;
 
     public Board() {
-        temp_board = new Piece[8][8];
         game_board = new Piece[8][8];
-//        initBoard(temp_board);
-//        initBoard(game_board);
     }
     // constructor with fen string
     public Board(String fen) {
@@ -55,7 +50,7 @@ public class Board {
             }
             r++;
         }
-        printBoard();
+//        printBoard();
         return ;
     }
 
@@ -68,7 +63,7 @@ public class Board {
             // check if game is over
             Colour opponent = player == Colour.BLACK ? Colour.WHITE : Colour.BLACK;
             if (playerHasValidMove(opponent))
-                return 0;
+                return 0; // code for valid move
             if (isKingInCheck(game_board, opponent))
                 return 1; // code for checkmate
             return 2; // code for stalemate
@@ -94,7 +89,7 @@ public class Board {
                 if (r2 == 0 && c2 == 6 && castle.contains("k"))
                     return 0;
             }
-            return -1;
+            return -1; // code for invalid  move
         }
     }
 

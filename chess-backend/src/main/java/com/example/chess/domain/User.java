@@ -1,9 +1,6 @@
 package com.example.chess.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor(access= AccessLevel.PRIVATE, force=true)
 @Entity
 @Builder
+@Table(name = "_user")
 public class User implements UserDetails  {
     @Size(min = 3, max = 69, message = "User names must have a minimum size of 3 and a maximum size of 69")
     @NotNull(message = "User name is a required field")
@@ -38,8 +36,6 @@ public class User implements UserDetails  {
     private int rating;
     @Enumerated(EnumType.STRING)
     private Provider providerType;
-
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

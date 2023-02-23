@@ -1,10 +1,7 @@
 package com.example.chess.service;
 
-import com.example.chess.domain.AuthenticationRequest;
-import com.example.chess.domain.AuthenticationResponse;
-import com.example.chess.domain.RegisterRequest;
-import com.example.chess.domain.User;
-import com.example.chess.exception.UserNameAlreadyExistsException;
+import com.example.chess.domain.*;
+import com.example.chess.exception.UserAlreadyExistsException;
 import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,9 +24,9 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
-        Optional<User> tempUser  = repository.findByUsername(request.getUsername());
+        Optional<User> tempUser  = repository.findByUserEmail(request.getUserEmail());
         if (tempUser.isPresent())
-            throw new UserNameAlreadyExistsException();
+            throw new UserAlreadyExistsException();
         User user = User.builder()
                 .userEmail(request.getUserEmail())
                 .username(request.getUsername())
@@ -39,6 +36,7 @@ public class AuthenticationService {
                 .gamesLost(0)
                 .gamesWon(0)
                 .rating(600)
+                .providerType(Provider.LOCAL)
                 .build();
         repository.save(user);
         var jwtToken = jwtService.generateToken(user);
@@ -50,9 +48,9 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-        var user = repository.findByUsername(request.getUsername());
+        var user = repository.findByUserEmail(request.getEmail());
         if (user.isEmpty())
             throw new UserNotFoundException();
         var jwtToken = jwtService.generateToken(user.get());

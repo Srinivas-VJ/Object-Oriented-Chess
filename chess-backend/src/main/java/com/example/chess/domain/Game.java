@@ -2,8 +2,6 @@ package com.example.chess.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +20,6 @@ public class Game {
     private String playerWhite;
 
     private String playerBlack;
-    // might need a different representation for color
     private String currentPlayerColor = "white";
     private List<String> moves;
     private String status;
