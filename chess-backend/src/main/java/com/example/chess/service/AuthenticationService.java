@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,7 @@ public class AuthenticationService {
                 .gamesDrawn(0)
                 .gamesLost(0)
                 .gamesWon(0)
-                .rating(600)
+                .rating(List.of(600))
                 .providerType(Provider.LOCAL)
                 .build();
         repository.save(user);

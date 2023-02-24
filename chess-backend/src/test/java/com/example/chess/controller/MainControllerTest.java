@@ -62,6 +62,6 @@ class MainControllerTest {
                         get("/users")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        assertEquals(HttpStatus.FOUND.value(), response.getStatus());
+        assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatus());
     }
 }

@@ -1,6 +1,7 @@
 package com.example.chess.controller;
 
 import com.example.chess.domain.User;
+import com.example.chess.domain.UserResponse;
 import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.service.UserService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,19 +24,22 @@ public class MainController {
     UserService userService;
 
     @GetMapping("/users")
-    public List<User> getAllUsers() {
-        return userService.getAllUser();
+    public List<UserResponse> getAllUsers() {
+        List<User> users = userService.getAllUser();
+        List<UserResponse> response = new ArrayList<>();
+        users.stream().map(UserResponse::new).forEach(response::add);
+        return response;
     }
     @GetMapping("/users/{userName}")
-    public User getAllUsers(@PathVariable String userName) {
-        return userService.getUserByUserName(userName);
+    public UserResponse getUserByUsername(@PathVariable String userName) {
+        return new UserResponse(userService.getUserByUserName(userName));
     }
     @DeleteMapping("/users/{userName}")
     public ResponseEntity<Object> deleteUserByUserName (@PathVariable String userName) {
         User deletedUser = userService.deleteUserByUserName(userName);
         if (deletedUser == null)
             throw new UserNotFoundException();
-        return new ResponseEntity<>(deletedUser, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new UserResponse(deletedUser), HttpStatus.NO_CONTENT);
     }
     @PostMapping("/users")
     public ResponseEntity<Object> createUser(@Valid @RequestBody User user) {

@@ -60,12 +60,12 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String jwtToken) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(jwtToken)
-                .getBody();
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(jwtToken)
+                    .getBody();
     }
 
     private Key getSignInKey() {

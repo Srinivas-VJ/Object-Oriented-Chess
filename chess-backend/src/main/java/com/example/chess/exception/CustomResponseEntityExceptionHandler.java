@@ -1,5 +1,6 @@
 package com.example.chess.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,6 +36,11 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
     public final ResponseEntity<Object> handleUsernameAlreadyExists(UserAlreadyExistsException exception, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ExpiredJwtException.class)
+    public final ResponseEntity<Object> handleExpiredToken(ExpiredJwtException exception, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.UNAUTHORIZED);
     }
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<Object> handler(Exception exception, WebRequest request) {

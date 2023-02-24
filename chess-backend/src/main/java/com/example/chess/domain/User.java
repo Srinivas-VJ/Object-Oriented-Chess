@@ -33,7 +33,7 @@ public class User implements UserDetails  {
     private int gamesWon;
     private int gamesLost;
     private int gamesDrawn;
-    private int rating;
+    private List<Integer> rating;
     @Enumerated(EnumType.STRING)
     private Provider providerType;
 

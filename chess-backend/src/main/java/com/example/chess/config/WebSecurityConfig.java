@@ -13,6 +13,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -49,24 +50,28 @@ public class WebSecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
+
     @Bean
     protected DefaultSecurityFilterChain configure(HttpSecurity http) throws Exception {
 
+//        jwtAuthenticationFilter.setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
+
         return http
                 .cors().and().csrf().disable()
-                    .oauth2Login()
-                    .userInfoEndpoint().userService(customOAuth2Service)
-                    .and()
-                    .successHandler(oAuth2LoginSuccessHandler)
-                .and()
+//                    .oauth2Login()
+//                    .userInfoEndpoint().userService(customOAuth2Service)
+//                    .and()
+//                    .successHandler(oAuth2LoginSuccessHandler)
+//                .and()
                 .authorizeHttpRequests()
                 .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users", "/game").hasRole("ADMIN")
                 .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/login/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
                 .logout(l -> l.logoutSuccessUrl("/").permitAll())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

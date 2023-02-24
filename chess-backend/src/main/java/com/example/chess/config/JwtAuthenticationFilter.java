@@ -32,15 +32,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
            return;
        }
        jwtToken = authHeader.substring(7);
-       email = jwtService.extractUserName(jwtToken);
+       try {
+           email = jwtService.extractUserName(jwtToken);
+       }
+       catch (Exception ex) {
+           response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+           response.flushBuffer();
+           return; // End the request
+       }
        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null)   {
            User userDetails = this.userDetailsService.loadUserByUsername(email);
-           if (jwtService.isTokenValid(jwtToken, userDetails)) {
-               UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-               authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-               SecurityContextHolder.getContext().setAuthentication(authToken);
+           try {
+               if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                   UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                   authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                   SecurityContextHolder.getContext().setAuthentication(authToken);
+               }
+           }
+           catch (Exception exception) {
+               response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+               response.flushBuffer();
+               return; // End the request
            }
        }
        filterChain.doFilter(request, response);
+
     }
 }
