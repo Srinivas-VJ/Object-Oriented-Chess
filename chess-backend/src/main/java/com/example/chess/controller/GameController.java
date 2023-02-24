@@ -10,7 +10,6 @@ import com.example.chess.exception.InvalidMoveException;
 import com.example.chess.pieces.Board;
 import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
-import com.example.chess.service.JwtService;
 import com.example.chess.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +32,6 @@ public class GameController {
     private UserService userService;
     @Autowired
     private SimpMessagingTemplate template;
-    @Autowired
-    private JwtService jwtService;
 
     private Map<String, Game> ongoingGames = new HashMap<>();
     private Map<String, String> gameStates = new HashMap<>();

@@ -20,8 +20,6 @@ import java.util.List;
 public class MainController {
     @Autowired
     UserService userService;
-    @Autowired
-    GameController gameMoveController;
 
     @GetMapping("/users")
     public List<User> getAllUsers() {

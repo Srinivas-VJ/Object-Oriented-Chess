@@ -6,6 +6,7 @@ import com.example.chess.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -59,9 +60,9 @@ public class WebSecurityConfig {
                     .successHandler(oAuth2LoginSuccessHandler)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/game/**", "/gs-guide-websocket/**").permitAll()
-//                .requestMatchers("/users", "/game").hasRole("ADMIN")
-//                .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/users", "/game").hasRole("ADMIN")
+                .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().authenticated()
                 .and()
 //                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
