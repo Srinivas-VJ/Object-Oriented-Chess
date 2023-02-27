@@ -159,13 +159,12 @@ public class GameController {
             User loser = player == Colour.BLACK ? whitePlayer : blackPlayer;
             winner.setGamesWon(winner.getGamesWon() + 1);
             loser.setGamesLost(loser.getGamesLost() + 1);
-            // rating change logic here
+            updateRatings(winner, loser);
         }
         else if (status == 2) {
             game.setStatus("Game drawn by Stalemate");
             whitePlayer.setGamesDrawn(whitePlayer.getGamesDrawn() + 1);
             blackPlayer.setGamesDrawn(blackPlayer.getGamesDrawn() + 1);
-            // rating change logic here
         }
         else if (status == 3) {
             game.setStatus(player + " resigned");
@@ -173,17 +172,34 @@ public class GameController {
             User loser = player == Colour.BLACK ? blackPlayer : whitePlayer;
             winner.setGamesWon(winner.getGamesWon() + 1);
             loser.setGamesLost(loser.getGamesLost() + 1);
-            // rating change logic here
+            updateRatings(winner, loser);
         }
         else if (status == 4) {
             game.setStatus("Game drawn by agreement");
             whitePlayer.setGamesDrawn(whitePlayer.getGamesDrawn() + 1);
             blackPlayer.setGamesDrawn(blackPlayer.getGamesDrawn() + 1);
-            // rating change logic here
         }
         userService.updateUser(whitePlayer);
         userService.updateUser(blackPlayer);
         gameService.updateGame(game);
+    }
+
+    private void updateRatings(User winner, User loser) {
+        int factor = 30;
+        int winnerRating = winner.getRating().get(winner.getRating().size() - 1);
+        int loserRating = loser.getRating().get(loser.getRating().size() - 1);
+        float winningProbabilityOfWinner = calculateWinningProbability((float) loserRating, (float) winnerRating);
+        float winningProbabilityOfLoser = calculateWinningProbability((float) winnerRating, (float) loserRating);
+        winnerRating = Math.round(winnerRating + factor * (1 - winningProbabilityOfWinner));
+        loserRating = Math.round(loserRating + factor * (0 - winningProbabilityOfLoser));
+        winner.getRating().add(winnerRating);
+        loser.getRating().add(loserRating);
+    }
+
+    private float calculateWinningProbability(float loserRating, float winnerRating) {
+        return 1.0f
+                / (1 + (float) (Math.pow(10, (loserRating - winnerRating) / 400)));
+
     }
 }
 
