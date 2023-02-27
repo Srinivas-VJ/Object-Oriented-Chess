@@ -1,6 +1,8 @@
 package com.example.chess.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,9 +27,13 @@ public class Game {
     private String status;
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private DrawState drawState;
+
     public void makeMove(String move) {
         moves.add(move);
     }
 
 
 }
+

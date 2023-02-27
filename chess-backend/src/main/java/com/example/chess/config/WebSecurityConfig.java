@@ -54,20 +54,18 @@ public class WebSecurityConfig {
     @Bean
     protected DefaultSecurityFilterChain configure(HttpSecurity http) throws Exception {
 
-//        jwtAuthenticationFilter.setAuthenticationSuccessHandler(new JwtAuthenticationSuccessHandler());
 
         return http
                 .cors().and().csrf().disable()
-//                    .oauth2Login()
-//                    .userInfoEndpoint().userService(customOAuth2Service)
-//                    .and()
-//                    .successHandler(oAuth2LoginSuccessHandler)
-//                .and()
+                    .oauth2Login()
+                    .userInfoEndpoint().userService(customOAuth2Service)
+                    .and()
+                    .successHandler(oAuth2LoginSuccessHandler)
+                .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**").permitAll()
+                .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**", "/login**", "/oauth2**", "/callback/", "/webjars/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users", "/game").hasRole("ADMIN")
                 .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
-                .requestMatchers("/login/oauth2/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

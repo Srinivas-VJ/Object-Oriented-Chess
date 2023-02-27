@@ -10,6 +10,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,7 +29,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             if (user.getAttributes().containsKey("sub")) {
                 newUser = User.builder()
                         .userEmail(user.getEmail())
-                        .rating(600)
+                        .rating(List.of(600))
                         .gamesWon(0)
                         .gamesLost(0)
                         .gamesDrawn(0)
@@ -42,7 +43,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             else {
                 newUser = User.builder()
                         .userEmail(user.getEmail())
-                        .rating(600)
+                        .rating(List.of(600))
                         .gamesWon(0)
                         .gamesLost(0)
                         .gamesDrawn(0)
