@@ -2,22 +2,27 @@ import React from "react";
 import { getUserDetails } from "../utils/authenticate";
 
 const user = getUserDetails();
-console.log(user)
+console.log(user);
 const LandingPage = () => (
-  <div className="container" style={{backgroundImage : `url(https://wallpapercave.com/wp/wp2883302.jpg)`, backgroundSize : "cover"}}>
+  <div
+    className="container"
+    style={{
+      backgroundImage: `url(https://wallpapercave.com/wp/wp2883302.jpg)`,
+      backgroundSize: "cover",
+    }}
+  >
     <h1 className="title">Welcome to the Chess App</h1>
     <p className="description">
       Ready to test your chess skills? Start a new game and challenge yourself!
     </p>
     <div className="cta-container">
-      <a href="/newgame" className="cta-button">
+      <a href="Object-Oriented-Chess/newgame" className="cta-button">
         Start a new game
       </a>
     </div>
 
     <style jsx>{`
       .body {
-        
       }
       .container {
         display: flex;
