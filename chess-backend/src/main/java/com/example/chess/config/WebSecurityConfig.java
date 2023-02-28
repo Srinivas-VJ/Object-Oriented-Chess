@@ -63,7 +63,7 @@ public class WebSecurityConfig {
                     .successHandler(oAuth2LoginSuccessHandler)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**", "/login**", "/oauth2**", "/callback/", "/webjars/**").permitAll()
+                .requestMatchers( "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**", "/login**", "/oauth2**", "/callback/", "/webjars/**", "/auth/**", "/", "/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users", "/game").hasRole("ADMIN")
                 .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().authenticated()

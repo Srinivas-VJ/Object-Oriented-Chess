@@ -1,5 +1,6 @@
 package com.example.chess.service;
 
+import com.example.chess.domain.DrawState;
 import com.example.chess.domain.Game;
 import com.example.chess.exception.GameNotFoundException;
 import com.example.chess.repository.GameRepository;
@@ -31,7 +32,7 @@ class GameServiceTest {
 
     @BeforeAll
     static void beforeAll() {
-        dummyGame = new Game("1", "test", "test", "white", new ArrayList<>(), "", "");
+        dummyGame = new Game("1", "test", "test", "white", new ArrayList<>(), "", "", DrawState.NULL);
     }
 
 

@@ -4,6 +4,7 @@ import com.example.chess.domain.*;
 import com.example.chess.exception.GameHasNoPlayerException;
 import com.example.chess.exception.GameNotFoundException;
 import com.example.chess.exception.InvalidMoveException;
+import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.pieces.Board;
 import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
@@ -72,10 +73,10 @@ public class GameController {
         if (game.getPlayerBlack() ==  null || game.getPlayerWhite() == null)
             throw new GameHasNoPlayerException();
 
-//        var user1  = userService.getUserByUserName(game.getPlayerBlack());
-//        var user2  = userService.getUserByUserName(game.getPlayerWhite());
-//        if (user1 == null || user2  == null)
-//            throw new UserNotFoundException();
+        var user1  = userService.getUserByUserName(game.getPlayerBlack());
+        var user2  = userService.getUserByUserName(game.getPlayerWhite());
+        if (user1 == null || user2  == null)
+            throw new UserNotFoundException();
 
         String message = game.getPlayerBlack() + game.getPlayerWhite();
         message +=  new Date().getTime();
@@ -93,10 +94,10 @@ public class GameController {
     public ResponseEntity<Object> processMoveRequest(@PathVariable String gameId, @RequestBody MoveRequestMessage moveRequestMessage, @AuthenticationPrincipal User authenticatedUser) throws InvalidMoveException {
         // process the move here
         Game game = ongoingGames.get(gameId);
-//        String playerChar = moveRequestMessage.getFen().split(" ")[1];
-//        if ((playerChar.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
-//           (playerChar.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
-//        {
+        String playerChar = moveRequestMessage.getFen().split(" ")[1];
+        if ((playerChar.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
+           (playerChar.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
+        {
             if (!ongoingGames.containsKey(gameId))
                 throw new GameNotFoundException();
 
@@ -142,8 +143,8 @@ public class GameController {
                 }
                 default -> throw new InvalidMoveException();
             }
-//        }
-//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     private void handleGameOver(Game game, int status, Colour player) {

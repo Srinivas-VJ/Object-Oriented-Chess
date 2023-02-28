@@ -4,14 +4,15 @@ import com.example.chess.domain.AuthenticationRequest;
 import com.example.chess.domain.RegisterRequest;
 import com.example.chess.domain.User;
 import com.example.chess.exception.UserAlreadyExistsException;
+import com.example.chess.exception.UserNotFoundException;
 import com.example.chess.repository.UserRepository;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -25,9 +26,13 @@ class AuthenticationServiceTest {
     private UserRepository userRepository;
     @InjectMocks
     private AuthenticationService authenticationService;
-
+    @Mock
+    private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtService jwtService;
+    @Mock
+    private AuthenticationManager authenticationManager;
     @Test
-    @Disabled
     void registerFails() {
         RegisterRequest request = new RegisterRequest("test", "test@gmail.com", "password", "");
         User dummyUser = User.builder()
@@ -40,7 +45,6 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    @Disabled
     void registerSucceeds() {
         RegisterRequest request = new RegisterRequest("test", "abc@gmail.com", "password", "");
         authenticationService.register(request);
@@ -48,14 +52,12 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    @Disabled
     void authenticateFailed() {
         AuthenticationRequest request = new AuthenticationRequest("test@gmail.com", "password");
-        assertThrows(UsernameNotFoundException.class, () -> authenticationService.authenticate(request));
+        assertThrows(UserNotFoundException.class, () -> authenticationService.authenticate(request));
         verify(userRepository).findByUserEmail("test@gmail.com");
     }
     @Test
-    @Disabled
     void authenticateSuccess() {
         User dummyUser = User.builder()
                 .userEmail("test@gmail.com")
@@ -64,7 +66,7 @@ class AuthenticationServiceTest {
                 .build();
         when(userRepository.findByUserEmail("test@gmail.com")).thenReturn(Optional.ofNullable(dummyUser));
         AuthenticationRequest request = new AuthenticationRequest("test@gmail.com", "password");
-        assertThrows(UsernameNotFoundException.class, () -> authenticationService.authenticate(request));
+        authenticationService.authenticate(request);
         verify(userRepository).findByUserEmail("test@gmail.com");
     }
 }
