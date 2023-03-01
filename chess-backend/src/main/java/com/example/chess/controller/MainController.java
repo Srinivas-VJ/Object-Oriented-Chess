@@ -47,6 +47,7 @@ public class MainController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{userName}").buildAndExpand(user.getUsername()).toUri();
         return ResponseEntity.created(location).build();
     }
+    // this is just for testing purpose
     @GetMapping("/test")
     public String test(Principal principal) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

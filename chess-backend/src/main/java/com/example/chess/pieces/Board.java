@@ -7,12 +7,7 @@ import java.util.ArrayList;
 
 @Getter
 public class Board {
-
-
-    //represent the actual game state
     private Piece[][] game_board;
-
-
     public Board() {
         game_board = new Piece[8][8];
     }
@@ -50,7 +45,6 @@ public class Board {
             }
             r++;
         }
-//        printBoard();
         return ;
     }
 
@@ -92,7 +86,6 @@ public class Board {
             return -1; // code for invalid  move
         }
     }
-
     public boolean makeMove(int r1, int c1, int r2, int c2, Colour player) {
         //empty square
         if (game_board[r1][c1] == null) {
@@ -133,17 +126,10 @@ public class Board {
                 }
                 return true;
             }
-
         }
-
         return false;
-
     }
-
-
     public boolean isKingInCheck(Piece[][] board, Colour player) {
-        //check if the king is in check
-
         // get king position
         int r = -1, c = -1;
         for (int i = 0; i < 8; i++) {
@@ -277,9 +263,7 @@ public class Board {
         b[0][6] = new Knight(Colour.BLACK);
         b[7][1] = new Knight(Colour.WHITE);
         b[7][6] = new Knight(Colour.WHITE);
-
     }
-
     public void printBoard() {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
@@ -326,9 +310,7 @@ public class Board {
                         }
                         default -> System.out.println(" ");
                     }
-
                 }
-
             }
             System.out.println();
         }

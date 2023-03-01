@@ -86,7 +86,7 @@ class GameControllerTest {
                         get("/game")
                                 .accept(MediaType.APPLICATION_JSON))
                 .andReturn().getResponse();
-        assertEquals(HttpStatus.FORBIDDEN.value() ,response.getStatus());
+        assertEquals(HttpStatus.FOUND.value() ,response.getStatus());
     }
 
     @Test

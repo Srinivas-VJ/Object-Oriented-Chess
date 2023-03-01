@@ -25,8 +25,6 @@ public class UserResponse {
     private String profilePicture;
     private int gamesWon;
     private int gamesLost;
-
     private int gamesDrawn;
-
     private List<Integer> rating;
 }

@@ -26,9 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomOAuth2Service customOAuth2Service;
-
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
@@ -40,7 +38,6 @@ public class WebSecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,12 +46,8 @@ public class WebSecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
-
-
     @Bean
     protected DefaultSecurityFilterChain configure(HttpSecurity http) throws Exception {
-
-
         return http
                 .cors().and().csrf().disable()
                     .oauth2Login()
@@ -63,8 +56,8 @@ public class WebSecurityConfig {
                     .successHandler(oAuth2LoginSuccessHandler)
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers( "/test" , "/auth/**", "/actuator/**", "/move/**", "/gs-guide-websocket/**", "/login**", "/oauth2**", "/callback/", "/webjars/**", "/auth/**", "/", "/error").permitAll()
-                .requestMatchers(HttpMethod.GET, "/users", "/game").hasRole("ADMIN")
+                .requestMatchers( "/test" , "/auth/**", "/move/**", "/gs-guide-websocket/**", "/login**", "/oauth2**", "/callback/", "/webjars/**", "/auth/**", "/", "/error").permitAll()
+                .requestMatchers(HttpMethod.GET, "/users", "/game", "/actuator**").hasRole("ADMIN")
                 .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().authenticated()
                 .and()
@@ -75,5 +68,4 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
 }

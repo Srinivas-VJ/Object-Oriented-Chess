@@ -14,9 +14,6 @@ import java.util.Date;
 @ControllerAdvice
 @RestController
 public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-
-
-
     @ExceptionHandler(UserNotFoundException.class)
     public final ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException userNotFoundException, WebRequest request) {
        ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), userNotFoundException.getMessage(), request.getDescription(false));
@@ -47,7 +44,6 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         ExceptionResponse exceptionResponse = new ExceptionResponse(new Date(), exception.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(exceptionResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {

@@ -20,7 +20,6 @@ public class Game {
     @Id
     private String gameID;
     private String playerWhite;
-
     private String playerBlack;
     private String currentPlayerColor = "white";
     private List<String> moves;

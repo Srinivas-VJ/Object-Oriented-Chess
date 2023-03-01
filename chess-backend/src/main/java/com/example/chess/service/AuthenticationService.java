@@ -21,7 +21,6 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-
     public AuthenticationResponse register(RegisterRequest request) {
         Optional<User> tempUser  = repository.findByUserEmail(request.getUserEmail());
         if (tempUser.isPresent())
@@ -42,7 +41,6 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
-
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {

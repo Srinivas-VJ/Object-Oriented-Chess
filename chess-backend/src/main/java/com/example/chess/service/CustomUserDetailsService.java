@@ -13,10 +13,8 @@ import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService, Serializable {
-
     @Autowired
     private UserRepository userRepo;
-
     @Override
     @Transactional
     public User loadUserByUsername(String email) throws UsernameNotFoundException {

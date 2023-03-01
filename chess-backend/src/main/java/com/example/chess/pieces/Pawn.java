@@ -27,13 +27,8 @@ public class Pawn extends Piece {
                 else res = (r2 + 1) == r1 && (board[r2][c2] == null);
             }
             //capture
-            else if ((board[r2][c2] != null) && (board[r2][c2].color == Colour.BLACK) && (r2 == (r1 - 1)) && (c2 == (c1 - 1) ||  c2 == (c1+1)))
-                res = true;
-            else
-                res = false;
-
+            else res = (board[r2][c2] != null) && (board[r2][c2].color == Colour.BLACK) && (r2 == (r1 - 1)) && (c2 == (c1 - 1) || c2 == (c1 + 1));
             return res;
-
         }
         // same thing for black code could be optimised
         else
@@ -49,9 +44,7 @@ public class Pawn extends Piece {
             }
             // capture
             else res = (board[r2][c2] != null) && (board[r2][c2].color == Colour.WHITE) && (r2 == (r1 + 1)) && (c2 == (c1 - 1) || c2 == (c1 + 1));
-
             return res;
         }
     }
-
 }

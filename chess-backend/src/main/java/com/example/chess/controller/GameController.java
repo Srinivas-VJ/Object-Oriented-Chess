@@ -23,7 +23,6 @@ import java.util.*;
 @RestController()
 @CrossOrigin(origins = "${frontend.url}")
 public class GameController {
-
     @Autowired
     private GameService gameService;
     @Autowired
@@ -44,27 +43,24 @@ public class GameController {
     }
     @GetMapping("/game/{gameId}/getFen")
     public ResponseEntity<String> getGameState(@PathVariable String gameId) {
-        if (gameStates.containsKey(gameId) && gameStates.get(gameId).length() != 0) {
+        if (gameStates.containsKey(gameId) && gameStates.get(gameId).length() != 0)
            return ResponseEntity.ok(gameStates.get(gameId));
-        }
         return ResponseEntity.ok("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     }
-
     @PutMapping("/game/{gameId}/moved")
     public ResponseEntity<Object> updateLastMove(@PathVariable String gameId, @RequestBody MoveRequestMessage  move, @AuthenticationPrincipal User authenticatedUser) {
-//        Game game = gameService.getGameByGameId(gameId);
-//        String player = move.getFen().split(" ")[1];
-//        if ((player.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
-//           (player.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
-//        {
+        Game game = gameService.getGameByGameId(gameId);
+        String player = move.getFen().split(" ")[1];
+        if ((player.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
+           (player.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
+        {
             if (gameStates.containsKey(gameId)) {
                 gameStates.put(gameId, move.getFen());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
     @PostMapping("/game")
     public ResponseEntity<String> createGame(@RequestBody Game game) {
@@ -89,7 +85,6 @@ public class GameController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{gameID}").buildAndExpand(game.getGameID()).toUri();
         return new ResponseEntity<>(game.getGameID(), HttpStatus.CREATED);
     }
-
     @PutMapping("/move/{gameId}")
     public ResponseEntity<Object> processMoveRequest(@PathVariable String gameId, @RequestBody MoveRequestMessage moveRequestMessage, @AuthenticationPrincipal User authenticatedUser) throws InvalidMoveException {
         // process the move here
@@ -114,7 +109,6 @@ public class GameController {
                 return ResponseEntity.ok("Success!");
             }
 
-
             game.makeMove(moveRequestMessage.getFrom() + moveRequestMessage.getTo());
             Board board = new Board(moveRequestMessage.getFen());
             Colour player = moveRequestMessage.getColor().equals("white") ? Colour.WHITE : Colour.BLACK;
@@ -127,7 +121,6 @@ public class GameController {
                 }
                 case 1 ->
                 {
-                    // end game procedure , try async
                     handleGameOver(game, 1, player);
                     template.convertAndSend("/topic/move/{gameId}",  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
                     gameStates.remove(gameId);
@@ -135,7 +128,6 @@ public class GameController {
                 }
                 case 2 ->
                 {
-                    // end game procedure
                     handleGameOver(game, 2, player);
                     template.convertAndSend("/topic/move/{gameId}", new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
                     gameStates.remove(gameId);
@@ -151,7 +143,6 @@ public class GameController {
         ongoingGames.remove(game.getGameID());
         User whitePlayer = userService.getUserByUserName(game.getPlayerWhite());
         User blackPlayer = userService.getUserByUserName(game.getPlayerBlack());
-
         game.setDescription(String.format("Game between %s as white and %s as black", whitePlayer.getUsername(), blackPlayer.getUsername()));
 
         if (status == 1 ) {
@@ -200,7 +191,5 @@ public class GameController {
     private float calculateWinningProbability(float loserRating, float winnerRating) {
         return 1.0f
                 / (1 + (float) (Math.pow(10, (loserRating - winnerRating) / 400)));
-
     }
 }
-
