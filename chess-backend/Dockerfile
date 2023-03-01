@@ -1,3 +1,4 @@
+# temp build image
 FROM gradle:latest AS BUILD
 WORKDIR /usr/app/
 COPY . .

@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: url
-    username: username
-    password: password
+    url: jdbc:mysql://${MYSQLUSER}:${MYSQLPASSWORD}@${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
+    username: root
+    password: '${MYSQLPASSWORD}'
   jpa:
     hibernate.ddl-auto: update
     generate-ddl: true
@@ -12,13 +12,13 @@ spring:
       client:
         registration:
           google:
-            clientId: <ID>
-            clientSecret: <Secret>
+            clientId: '${CLIENT_ID_GOOGLE}'
+            clientSecret: '${CLIENT_SECRET_GOOGLE}'
           github:
-            clientId: <ID>
-            clientSecret: <Secret>
+            clientId: ${CLIENT_ID_GITHUB}
+            clientSecret: ${CLIENT_SECRET_GITHUB}
 frontend:
-  url : "http://localhost:3000"
+  url : '${FRONTEND}'
 
 encryption:
-  secret: ""
+  secret: '${KEY}'
