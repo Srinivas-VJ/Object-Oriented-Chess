@@ -16,7 +16,7 @@ const LandingPage = () => (
       Ready to test your chess skills? Start a new game and challenge yourself!
     </p>
     <div className="cta-container">
-      <a href="Object-Oriented-Chess/newgame" className="cta-button">
+      <a href="/newgame" className="cta-button">
         Start a new game
       </a>
     </div>

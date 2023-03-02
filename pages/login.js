@@ -20,7 +20,7 @@ const Login = () => {
       const user = response.data.userResponse;
       setAuthToken(token);
       setUserDetails(user);
-      router.push("/Object-Oriented-Chess/");
+      router.push("/");
     } catch (error) {
       console.error(error);
     }
@@ -74,7 +74,7 @@ const Login = () => {
 
         <div>
           Don't have an account?{" "}
-          <a href="Object-Oriented-Chess/register">Register here</a>
+          <a href="/register">Register here</a>
         </div>
       </div>
     </div>

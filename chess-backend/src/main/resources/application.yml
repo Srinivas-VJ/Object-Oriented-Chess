@@ -10,11 +10,14 @@ management:
         allowed-origins: http://localhost:3000
         allowed-methods: GET ,POST
 
+debug: true
+
 spring:
   devtools:
     livereload:
       enabled: false
   profiles:
     active: prod
+
 
 
