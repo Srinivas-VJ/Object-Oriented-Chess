@@ -3,6 +3,7 @@ import axios from "axios";
 import { Form, Input, Button } from "antd";
 import { useRouter } from "next/router";
 import { setAuthToken, setUserDetails } from "../utils/authenticate";
+import Link from "next/link";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -74,7 +75,9 @@ const Login = () => {
 
         <div>
           Don't have an account?{" "}
-          <a href="/register">Register here</a>
+          <Link href={"/register"}>
+              Register here
+          </Link>
         </div>
       </div>
     </div>

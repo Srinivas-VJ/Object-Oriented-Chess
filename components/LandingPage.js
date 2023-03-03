@@ -1,5 +1,6 @@
 import React from "react";
 import { getUserDetails } from "../utils/authenticate";
+import Link from "next/link";
 
 const user = getUserDetails();
 console.log(user);
@@ -16,9 +17,11 @@ const LandingPage = () => (
       Ready to test your chess skills? Start a new game and challenge yourself!
     </p>
     <div className="cta-container">
-      <a href="/newgame" className="cta-button">
+      <Link href={"/newgame"}>
+        <button className="cta-button">
         Start a new game
-      </a>
+        </button>
+      </Link>
     </div>
 
     <style jsx>{`
