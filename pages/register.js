@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/router";
-
+import { SERVER_ENDPOINT } from "../config";
 function Register() {
   const router = useRouter();
   const [username, setUsername] = useState("");
@@ -23,7 +23,7 @@ function Register() {
     }
 
     try {
-      const response = await axios.post("/api/register", {
+      const response = await axios.post(SERVER_ENDPOINT + "/auth/register" , {
         username,
         userEmail: userEmail,
         password,

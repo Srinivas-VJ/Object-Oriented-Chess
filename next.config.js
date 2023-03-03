@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  basePath : "/Object-Oriented-Chess/"
+  // basePath : "/Object-Oriented-Chess"
 }
 
 module.exports = nextConfig

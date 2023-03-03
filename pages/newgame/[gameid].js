@@ -17,6 +17,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   const [turn, setTurn] = useState("white");
   const [visible, setVisible] = useState(false);
   const router = useRouter();
+  var headers;
   const handleOk = () => {
     setVisible(false);
     router.push("/game");
@@ -27,7 +28,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 
   useEffect(() => {
     token = getAuthToken();
-    const headers = { Authorization: `Bearer ${token}` };
+    headers = { Authorization: `Bearer ${token}` };
     if (called) return;
     called = true;
 
@@ -102,6 +103,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
                 to: move.to,
                 color: playerColor,
                 fen: gameCopy.fen(),
+                drawState : "NULL"
               },
               { headers }
             )

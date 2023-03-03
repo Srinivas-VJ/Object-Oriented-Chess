@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+//@CrossOrigin(origins = "http://localhost:3000")
 public class AuthenticationController {
     private final UserRepository userRepo;
     private final AuthenticationService authenticationService;

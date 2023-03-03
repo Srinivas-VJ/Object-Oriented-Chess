@@ -2,8 +2,10 @@ const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_details';
 
 export function setAuthToken(token) {
-    if (typeof window !== "undefined")
+    if (typeof window !== "undefined") {
         localStorage.setItem(TOKEN_KEY, token);
+        console.log(`token set to ${token}`)
+    }
 }
 
 export function getAuthToken() {
@@ -14,7 +16,7 @@ export function getAuthToken() {
 
 export function removeAuthToken() {
     if (typeof window !== "undefined")
-  localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(TOKEN_KEY);
 }
 
 export function setUserDetails(user) {
@@ -23,8 +25,10 @@ export function setUserDetails(user) {
 }
 
 export function getUserDetails() {
-    if (typeof window !== "undefined")
+    if (typeof window !== "undefined") {
         var user = localStorage.getItem(USER_KEY);
+        console.log(`user set to  ${user}`)
+    }
   return user ? JSON.parse(user) : null;
 }
 

@@ -4,6 +4,7 @@ import { Form, Input, Button } from "antd";
 import { useRouter } from "next/router";
 import { setAuthToken, setUserDetails } from "../utils/authenticate";
 import Link from "next/link";
+import { SERVER_ENDPOINT } from "../config";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +13,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post("/api/login", {
+      const response = await axios.post(SERVER_ENDPOINT + "/auth/authenticate", {
         email,
         password,
       });

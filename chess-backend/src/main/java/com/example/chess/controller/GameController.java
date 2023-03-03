@@ -13,11 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 
 @RestController()
@@ -86,12 +89,14 @@ public class GameController {
         return new ResponseEntity<>(game.getGameID(), HttpStatus.CREATED);
     }
     @PutMapping("/move/{gameId}")
-    public ResponseEntity<Object> processMoveRequest(@PathVariable String gameId, @RequestBody MoveRequestMessage moveRequestMessage, @AuthenticationPrincipal User authenticatedUser) throws InvalidMoveException {
+    public ResponseEntity<Object> processMoveRequest(@PathVariable String gameId, @RequestBody MoveRequestMessage moveRequestMessage, Principal principal) throws InvalidMoveException {
         // process the move here
         Game game = ongoingGames.get(gameId);
+        System.out.println(principal);
+        Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
         String playerChar = moveRequestMessage.getFen().split(" ")[1];
-        if ((playerChar.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
-           (playerChar.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
+        if ((playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
+           (playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerWhite())))
         {
             if (!ongoingGames.containsKey(gameId))
                 throw new GameNotFoundException();

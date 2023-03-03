@@ -10,20 +10,23 @@ const GamePage = () => {
   const [player2, setPlayer2] = useState("");
   const [gameId, setGameId] = useState("");
   const [currentPlayerColor, setCurrentPlayerColor] = useState("white");
+  const [jwttoken, setToken] = useState(null);
   const router = useRouter();
-  var token;
 
   useEffect(() => {
-    token = getAuthToken();
+    const token = getAuthToken();
     if (token != null) {
-		console.log(token)
+		  console.log("token is " + token)
+      setToken(token);
       const user = getUserDetails();
       setPlayer1(user.username);
-    } else router.push("/login");
+    } 
+    else 
+      router.push("/login");
   }, []);
 
   const handleStartGame = async () => {
-	const headers = { Authorization: `Bearer ${token}` };
+	const headers = { Authorization: `Bearer ${jwttoken}` };
 	console.log(headers)
     const response = await axios.post(URL, {
       playerWhite: player1,
