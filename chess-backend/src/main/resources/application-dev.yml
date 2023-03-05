@@ -1,12 +1,27 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/chess_dev
-    username: username
+    url: jdbc:mysql://localhost:3306/chess_dev?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false&sessionVariables=sql_mode=''
+    username: root
     password: password
   jpa:
     hibernate.ddl-auto: update
     generate-ddl: true
     show-sql: true
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            clientId: '${CLIENT_ID_GOOGLE}'
+            clientSecret: '${CLIENT_SECRET_GOOGLE}'
+          github:
+            clientId: ${CLIENT_ID_GITHUB}
+            clientSecret: ${CLIENT_SECRET_GITHUB}
+
+
 frontend:
-  url : "http://localhost:3000"
+  url : '${FRONTEND}'
+
+encryption:
+  secret: '${KEY}'

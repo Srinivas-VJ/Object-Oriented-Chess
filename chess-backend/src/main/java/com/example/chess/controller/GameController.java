@@ -95,9 +95,9 @@ public class GameController {
         System.out.println(principal);
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
         String playerChar = moveRequestMessage.getFen().split(" ")[1];
-        if ((playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
-           (playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerWhite())))
-        {
+//        if ((playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
+//           (playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerWhite())))
+//        {
             if (!ongoingGames.containsKey(gameId))
                 throw new GameNotFoundException();
 
@@ -108,7 +108,7 @@ public class GameController {
                 return ResponseEntity.ok("Success!");
             }
             // check draw
-            if (moveRequestMessage.getDrawState().equals(DrawState.ACCEPTED)) {
+            if (DrawState.ACCEPTED.equals(moveRequestMessage.getDrawState())) {
                 template.convertAndSend("/topic/move/{gameId}", new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
                 gameStates.remove(gameId);
                 return ResponseEntity.ok("Success!");
@@ -120,28 +120,28 @@ public class GameController {
             int status = board.getMoveStatus(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), player, moveRequestMessage.getFen());
             switch (status) {
                 case 0 -> {
-                    gameStates.put(gameId, moveRequestMessage.getFen());
                     template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
+                    gameStates.put(gameId, moveRequestMessage.getFen());
                     return ResponseEntity.ok("Success!");
                 }
                 case 1 ->
                 {
-                    handleGameOver(game, 1, player);
                     template.convertAndSend("/topic/move/{gameId}",  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
-                    gameStates.remove(gameId);
+//                    handleGameOver(game, 1, player);
+//                    gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
                 }
                 case 2 ->
                 {
-                    handleGameOver(game, 2, player);
                     template.convertAndSend("/topic/move/{gameId}", new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
-                    gameStates.remove(gameId);
+//                    handleGameOver(game, 2, player);
+//                    gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
                 }
                 default -> throw new InvalidMoveException();
             }
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     private void handleGameOver(Game game, int status, Colour player) {
