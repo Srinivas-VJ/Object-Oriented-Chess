@@ -54,16 +54,16 @@ public class GameController {
     public ResponseEntity<Object> updateLastMove(@PathVariable String gameId, @RequestBody MoveRequestMessage  move, @AuthenticationPrincipal User authenticatedUser) {
         Game game = gameService.getGameByGameId(gameId);
         String player = move.getFen().split(" ")[1];
-        if ((player.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
-           (player.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
-        {
+//        if ((player.equals("w") && authenticatedUser.getUsername().equals(game.getPlayerBlack())) ||
+//           (player.equals("b") && authenticatedUser.getUsername().equals(game.getPlayerWhite())))
+//        {
             if (gameStates.containsKey(gameId)) {
                 gameStates.put(gameId, move.getFen());
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
     @PostMapping("/game")
     public ResponseEntity<String> createGame(@RequestBody Game game) {
@@ -103,13 +103,13 @@ public class GameController {
 
             // check resignation
             if (moveRequestMessage.isResign()) {
-                template.convertAndSend("/topic/move/{gameId}",  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
+                template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
                 gameStates.remove(gameId);
                 return ResponseEntity.ok("Success!");
             }
             // check draw
             if (DrawState.ACCEPTED.equals(moveRequestMessage.getDrawState())) {
-                template.convertAndSend("/topic/move/{gameId}", new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
+                template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
                 gameStates.remove(gameId);
                 return ResponseEntity.ok("Success!");
             }
@@ -126,16 +126,16 @@ public class GameController {
                 }
                 case 1 ->
                 {
-                    template.convertAndSend("/topic/move/{gameId}",  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
-//                    handleGameOver(game, 1, player);
-//                    gameStates.remove(gameId);
+                    template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
+                    handleGameOver(game, 1, player);
+                    gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
                 }
                 case 2 ->
                 {
-                    template.convertAndSend("/topic/move/{gameId}", new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
-//                    handleGameOver(game, 2, player);
-//                    gameStates.remove(gameId);
+                    template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
+                    handleGameOver(game, 2, player);
+                    gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
                 }
                 default -> throw new InvalidMoveException();
