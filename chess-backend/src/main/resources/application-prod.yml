@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://${MYSQLUSER}:${MYSQLPASSWORD}@${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}
-    username: root
-    password: '${MYSQLPASSWORD}'
+    url: jdbc:mysql://localhost:3306/chess?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true&autoReconnect=true&createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&jdbcCompliantTruncation=false&sessionVariables=sql_mode=''
+    username: srini
+    password: password
   jpa:
     hibernate.ddl-auto: update
     generate-ddl: true

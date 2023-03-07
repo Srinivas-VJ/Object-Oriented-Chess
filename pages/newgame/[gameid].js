@@ -16,11 +16,14 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   const [game, setGame] = useState(chess);
   const [turn, setTurn] = useState("white");
   const [visible, setVisible] = useState(false);
+  const [isCopied, setIsCopied] = useState(false)
+  const [gameStatus, setGameStatus] = useState("Game Over!");
+
   const router = useRouter();
   var headers;
   const handleOk = () => {
     setVisible(false);
-    router.push("/game");
+    router.push("/game/" + gameId);
   };
 
   gameId = router.query.gameid;
@@ -52,17 +55,17 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
             move.fen
           );
         }
-        if (move.status != "active") setVisible(true);
+        if (move.status != "active") {
+          setGameStatus(move.message);
+          setVisible(true);
+        }
       });
     });
     // get fen from backend
     axios
       .get(SERVER_ENDPOINT + "/game/" + gameId + "/getFen", { headers })
       .then((res) => {
-        console.log("Fetching fen from backend");
         const gameCopy = new Chess();
-        console.log(res);
-        console.log(res.data);
         gameCopy.load(res.data);
         setGame(gameCopy);
         if (res.data.split()[1] == "w" ? setTurn("white") : setTurn("black"));
@@ -155,6 +158,24 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     // illegal move
     if (move === null) return false;
     return true;
+  }
+  function copyGameLink() {
+    const url = window.location.href;
+    const color = url.split('=').pop();
+    console.log(color)
+    let newColor = 'white';
+    if (color === 'white') {
+      newColor = 'black';
+    }
+    const newUrl = url.replace(`${color}`, `${newColor}`);
+
+    navigator.clipboard.writeText(newUrl);
+    console.log(newUrl)
+    setIsCopied(true)
+
+    setTimeout(() => {
+      setIsCopied(false)
+    }, 2000)
   }
 
   return (
@@ -293,7 +314,9 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
           ),
         }}
       />{" "}
+      <button onClick={copyGameLink} style={{ backgroundColor: 'blue', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px' }} > {isCopied ? 'Link Copied!' : 'Copy Game Link'}</button>
       <Modal
+        id = "modal"
         title="Game Over"
         open={visible}
         onOk={handleOk}
@@ -303,7 +326,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
           </Button>,
         ]}
       >
-        Game over!
+        {gameStatus}
       </Modal>
     </div>
   );
