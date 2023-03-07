@@ -18,9 +18,10 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   const [visible, setVisible] = useState(false);
   const [isCopied, setIsCopied] = useState(false)
   const [gameStatus, setGameStatus] = useState("Game Over!");
+  const [headers, setHeaders] = useState({})
 
   const router = useRouter();
-  var headers;
+
   const handleOk = () => {
     setVisible(false);
     router.push("/game/" + gameId);
@@ -31,10 +32,9 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 
   useEffect(() => {
     token = getAuthToken();
-    headers = { Authorization: `Bearer ${token}` };
+    setHeaders({ Authorization: `Bearer ${token}` });
     if (called) return;
     called = true;
-
     var socket = new SockJS(SERVER_ENDPOINT + "/gs-guide-websocket");
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
@@ -69,7 +69,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         gameCopy.load(res.data);
         setGame(gameCopy);
         if (res.data.split()[1] == "w" ? setTurn("white") : setTurn("black"));
-        console.log(res);
+        console.log(res.data);
       });
   }, []);
 
@@ -85,6 +85,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     if (result != null) {
       setTurn(tempTurn == "w" ? "black" : "white");
       let path = "/app/move/" + gameId;
+      console.log(headers);
       axios
         .put(
           SERVER_ENDPOINT + "/move/" + gameId,

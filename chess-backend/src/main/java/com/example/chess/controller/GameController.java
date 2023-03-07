@@ -95,9 +95,9 @@ public class GameController {
         System.out.println(principal);
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
         String playerChar = moveRequestMessage.getFen().split(" ")[1];
-//        if ((playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
-//           (playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerWhite())))
-//        {
+        if ((playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
+           (playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerWhite())))
+        {
             if (!ongoingGames.containsKey(gameId))
                 throw new GameNotFoundException();
 
@@ -140,8 +140,8 @@ public class GameController {
                 }
                 default -> throw new InvalidMoveException();
             }
-//        }
-//        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     private void handleGameOver(Game game, int status, Colour player) {
