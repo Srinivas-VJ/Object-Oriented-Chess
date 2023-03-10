@@ -32,7 +32,5 @@ public class Game {
     public void makeMove(String move) {
         moves.add(move);
     }
-
-
 }
 

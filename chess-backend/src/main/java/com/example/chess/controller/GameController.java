@@ -66,7 +66,7 @@ public class GameController {
 //        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
     @PostMapping("/game")
-    public ResponseEntity<String> createGame(@RequestBody Game game) {
+    public ResponseEntity<String> createGame(@RequestBody Game game, Principal principal) {
         // generate gameID
         // check  if  both player-white  and player-black  exist  in the database
         if (game.getPlayerBlack() ==  null || game.getPlayerWhite() == null)
@@ -85,6 +85,9 @@ public class GameController {
         ongoingGames.put(game.getGameID(), game);
         gameStates.put(game.getGameID(), "");
 
+        String opponent = Objects.equals(principal.getName(), game.getPlayerBlack()) ? game.getPlayerWhite() : game.getPlayerBlack();
+        template.convertAndSendToUser(opponent , "/notification", game);
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{gameID}").buildAndExpand(game.getGameID()).toUri();
         return new ResponseEntity<>(game.getGameID(), HttpStatus.CREATED);
     }
@@ -92,28 +95,35 @@ public class GameController {
     public ResponseEntity<Object> processMoveRequest(@PathVariable String gameId, @RequestBody MoveRequestMessage moveRequestMessage, Principal principal) throws InvalidMoveException {
         // process the move here
         Game game = ongoingGames.get(gameId);
-        System.out.println(principal);
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
         String playerChar = moveRequestMessage.getFen().split(" ")[1];
+
+        if (!ongoingGames.containsKey(gameId))
+            throw new GameNotFoundException();
+
+        // check resignation
+        if (moveRequestMessage.isResign()) {
+            template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
+            handleGameOver(game, 3, playerChar.equals("b") ? Colour.BLACK : Colour.WHITE);
+            gameStates.remove(gameId);
+            return ResponseEntity.ok("Success!");
+        }
+        // check draw accepted
+        if (DrawState.ACCEPTED.equals(moveRequestMessage.getDrawState())) {
+            template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
+            handleGameOver(game, 4, playerChar.equals("b") ? Colour.BLACK : Colour.WHITE);
+            gameStates.remove(gameId);
+            return ResponseEntity.ok("Success!");
+        }
+        // check draw offered
+        if (DrawState.OFFERED.equals(moveRequestMessage.getDrawState())) {
+            template.convertAndSend("/topic/move/" + gameId ,new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
+            return ResponseEntity.ok("Success!");
+        }
+
         if ((playerChar.equals("b") && authenticatedUser.getName().equals(game.getPlayerBlack())) ||
            (playerChar.equals("w") && authenticatedUser.getName().equals(game.getPlayerWhite())))
         {
-            if (!ongoingGames.containsKey(gameId))
-                throw new GameNotFoundException();
-
-            // check resignation
-            if (moveRequestMessage.isResign()) {
-                template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
-                gameStates.remove(gameId);
-                return ResponseEntity.ok("Success!");
-            }
-            // check draw
-            if (DrawState.ACCEPTED.equals(moveRequestMessage.getDrawState())) {
-                template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
-                gameStates.remove(gameId);
-                return ResponseEntity.ok("Success!");
-            }
-
             game.makeMove(moveRequestMessage.getFrom() + moveRequestMessage.getTo());
             Board board = new Board(moveRequestMessage.getFen());
             Colour player = moveRequestMessage.getColor().equals("white") ? Colour.WHITE : Colour.BLACK;

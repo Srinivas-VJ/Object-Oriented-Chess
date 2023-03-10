@@ -11,40 +11,95 @@ const chess = new Chess();
 var stompClient = null;
 var called = false;
 var token;
+var drawOffered = "null"
 
 export default function PlayGame(player1, player2, gameId, playerColor) {
   const [game, setGame] = useState(chess);
   const [turn, setTurn] = useState("white");
   const [visible, setVisible] = useState(false);
-  const [isCopied, setIsCopied] = useState(false)
   const [gameStatus, setGameStatus] = useState("Game Over!");
   const [headers, setHeaders] = useState({})
+  const [drawOfferVisible, setDrawOfferVisible] = useState(false);
+  // const [drawOffered, setDrawOffered] = useState("null");
 
   const router = useRouter();
+  gameId = router.query.gameid;
+  playerColor = router.query.currentPlayerColor;
 
   const handleOk = () => {
     setVisible(false);
     router.push("/game/" + gameId);
   };
 
-  gameId = router.query.gameid;
-  playerColor = router.query.currentPlayerColor;
+  const offerDraw = () => {
+    console.log(playerColor + " is offereing a draw")
+    // setDrawOffered(playerColor);
+    drawOffered = playerColor;
+    axios.put(
+            SERVER_ENDPOINT + "/move/" + gameId,
+            {
+              from: "",
+              to: "",
+              color: "",
+              fen: game.fen(),
+              drawState : "OFFERED"
+            },
+            { headers }
+          )
+  }
+
+  const acceptDraw = () => {
+    axios.put(
+      SERVER_ENDPOINT + "/move/" + gameId,
+      {
+        from: "",
+        to: "",
+        color: "",
+        fen: game.fen(),
+        drawState : "ACCEPTED"
+      },
+      { headers }
+    )
+    setDrawOfferVisible(false);
+  }
+
+  const resign = () => {
+    axios.put(
+      SERVER_ENDPOINT + "/move/" + gameId,
+      {
+        from: "",
+        to: "",
+        color: "",
+        fen: game.fen(),
+        resign : true
+      },
+      { headers }
+    )
+  }
+
+  
 
   useEffect(() => {
+    if (called) return;
+      called = true;
+
     token = getAuthToken();
     setHeaders({ Authorization: `Bearer ${token}` });
-    if (called) return;
-    called = true;
+
     var socket = new SockJS(SERVER_ENDPOINT + "/gs-guide-websocket");
     stompClient = Stomp.over(socket);
+
     stompClient.connect({}, function (frame) {
-      console.log("Connected: " + frame);
       var path = "/topic/move/" + gameId;
       stompClient.subscribe(path, function (greeting) {
         const move = JSON.parse(greeting.body);
-        console.log(
-          `move from queue color - ${move.color}  and player is ${playerColor}`
-        );
+        if (move.drawState == "OFFERED") {
+          console.log(`${drawOffered} - ${playerColor}  =====================================`)
+          if (drawOffered != playerColor) 
+            setDrawOfferVisible(true)
+          else
+            drawOffered = "null";
+        }
         if (move.color != playerColor) {
           makeAMove(
             {
@@ -76,67 +131,55 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   useEffect(() => {}, [turn]);
 
   function makeAMove(move, fen) {
-    // try {
-    const gameCopy = new Chess();
-    gameCopy.load(fen);
-    const result = gameCopy.move(move);
-    setGame(gameCopy);
-    const tempTurn = fen.split(" ")[1];
-    if (result != null) {
-      setTurn(tempTurn == "w" ? "black" : "white");
-      let path = "/app/move/" + gameId;
-      console.log(headers);
-      axios
-        .put(
-          SERVER_ENDPOINT + "/move/" + gameId,
-          {
-            from: move.from,
-            to: move.to,
-            color: playerColor,
-            fen: game.fen(),
-          },
-          { headers }
-        )
-        .then((res) => {
-          console.log(res);
-          axios
-            .put(
-              SERVER_ENDPOINT + "/game/" + gameId + "/moved",
-              {
-                from: move.from,
-                to: move.to,
-                color: playerColor,
-                fen: gameCopy.fen(),
-                drawState : "NULL"
-              },
-              { headers }
-            )
-            .then((res) => console.log(res))
-            .catch((err) => console.log(err));
-        })
-        .catch((err) => console.log(err));
+    try {
+      const gameCopy = new Chess();
+      gameCopy.load(fen);
+      const result = gameCopy.move(move);
+      setGame(gameCopy);
+      const tempTurn = fen.split(" ")[1];
+      if (result != null) {
+        setTurn(tempTurn == "w" ? "black" : "white");
+        let path = "/app/move/" + gameId;
+
+        axios
+          .put(
+            SERVER_ENDPOINT + "/move/" + gameId,
+            {
+              from: move.from,
+              to: move.to,
+              color: playerColor,
+              fen: game.fen(),
+            },
+            { headers }
+          )
+          .then((res) => {
+            console.log(res);
+            axios
+              .put(
+                SERVER_ENDPOINT + "/game/" + gameId + "/moved",
+                {
+                  from: move.from,
+                  to: move.to,
+                  color: playerColor,
+                  fen: gameCopy.fen(),
+                  drawState : "NULL"
+                },
+                { headers }
+              )
+              .then((res) => console.log(res))
+              .catch((err) => console.log(err));
+          })
+          .catch((err) => console.log(err));
+      }
+      return result; // null if the move was illegal, the move object if the move was legal
     }
-    return result; // null if the move was illegal, the move object if the move was legal
-    // }
-    // catch {
-    //   console.log("INVALID MOVE");
-    // }
-  }
-
-  function makeRandomMove() {
-    const possibleMoves = game.moves();
-    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0)
-      return; // exit if the game is over
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    makeAMove(possibleMoves[randomIndex], game.fen());
-    var path = "/topic/move/" + gameId;
-
-    // stompClient.send(path, {}, JSON.stringify({'from': possibleMoves[randomIndex].from, 'to' : possibleMoves[randomIndex].from , 'color': playerColor == "white" ? "black" : "white" , 'fen' : game.fen()}));
+    catch {
+      console.log("INVALID MOVE");
+    }
   }
 
   function onDrop(sourceSquare, targetSquare) {
     if (game.get(sourceSquare).color != playerColor[0]) return false;
-    console.log("call to on drop " + sourceSquare + " " + targetSquare);
     const move = makeAMove(
       {
         from: sourceSquare,
@@ -145,53 +188,24 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
       },
       game.fen()
     );
-
-    // stompClient.send(
-    //   path,
-    //   {},
-    //   JSON.stringify({
-    //     from: sourceSquare,
-    //     to: targetSquare,
-    //     color: playerColor,
-    //     fen: game.fen(),
-    //   })
-    // );
-    // illegal move
     if (move === null) return false;
-    return true;
-  }
-  function copyGameLink() {
-    const url = window.location.href;
-    const color = url.split('=').pop();
-    console.log(color)
-    let newColor = 'white';
-    if (color === 'white') {
-      newColor = 'black';
-    }
-    const newUrl = url.replace(`${color}`, `${newColor}`);
-
-    navigator.clipboard.writeText(newUrl);
-    console.log(newUrl)
-    setIsCopied(true)
-
-    setTimeout(() => {
-      setIsCopied(false)
-    }, 2000)
+      return true;
   }
 
   return (
+    <div>
     <div
       style={{
         width: "700px",
       }}
     >
-      <span> Current player turn: {turn} </span>
+      <h2> Current player turn: {turn} </h2>
       <Chessboard
         alignContent="center"
         position={game.fen()}
         onPieceDrop={onDrop}
         boardOrientation={playerColor}
-        // customDarkSquareStyle={{ borderRadius: '5px', boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5 '}}
+        // customDarkSquareStyle={{ borderRadius: '5px'}}
         customPieces={{
           bK: ({ squareWidth = "32px" }) => (
             <div
@@ -314,8 +328,8 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
             </div>
           ),
         }}
-      />{" "}
-      <button onClick={copyGameLink} style={{ backgroundColor: 'blue', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '5px' }} > {isCopied ? 'Link Copied!' : 'Copy Game Link'}</button>
+      />
+
       <Modal
         id = "modal"
         title="Game Over"
@@ -329,7 +343,30 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
       >
         {gameStatus}
       </Modal>
+      <Modal
+        id = "modal"
+        title="Draw offer"
+        open={drawOfferVisible}
+        footer={[
+          <Button key="submit" type="primary" onClick={acceptDraw}>
+            Accept{" "}
+          </Button>,
+          <Button key="submit" type="primary" onClick={() => setDrawOfferVisible(false)}>
+          Decline{" "}
+        </Button>
+        ]}
+      >
+        {gameStatus}
+      </Modal>
     </div>
+    <button onClick={offerDraw} style = {{padding : "10px", marginTop : "15px", margin : "3px" , width : "20%"}}>
+      Draw 🤝
+    </button>
+    <button onClick={resign} style = {{padding : "10px", marginTop : "15px", margin : "3px",  width : "20%"}}>
+      Resign 🏳️
+    </button>
+    </div>
+
   );
 }
 PlayGame.getInitialProps = async ({ query }) => {
