@@ -31,9 +31,11 @@ const User = () => {
       <h1>User
     
       </h1>
+      <pre>
       <ul>
-          <li key={user.userName}>{JSON.stringify(user)}</li>
+          <li key={user.userName}>{JSON.stringify(user, null, 4)}</li>
       </ul>
+      </pre>
     </div>
   );
 };

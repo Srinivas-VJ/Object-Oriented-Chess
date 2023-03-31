@@ -33,8 +33,8 @@ public class GameController {
     @Autowired
     private SimpMessagingTemplate template;
 
-    private Map<String, Game> ongoingGames = new HashMap<>();
-    private Map<String, String> gameStates = new HashMap<>();
+    private final Map<String, Game> ongoingGames = new HashMap<>();
+    private final Map<String, String> gameStates = new HashMap<>();
 
     @GetMapping("/game")
     public List<Game> getAllGames() {

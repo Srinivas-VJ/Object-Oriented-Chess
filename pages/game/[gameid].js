@@ -23,9 +23,7 @@ const Game = () => {
   return (
     <div>
       <h1>Game</h1>
-      <ul>
-          <li key={game.gameID}>{JSON.stringify(game)}</li>
-      </ul>
+      <pre>{JSON.stringify(game, null, 4)}</pre>
     </div>
   );
 };

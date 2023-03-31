@@ -20,7 +20,6 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   const [gameStatus, setGameStatus] = useState("Game Over!");
   const [headers, setHeaders] = useState({})
   const [drawOfferVisible, setDrawOfferVisible] = useState(false);
-  // const [drawOffered, setDrawOffered] = useState("null");
 
   const router = useRouter();
   gameId = router.query.gameid;
@@ -32,8 +31,6 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
   };
 
   const offerDraw = () => {
-    console.log(playerColor + " is offereing a draw")
-    // setDrawOffered(playerColor);
     drawOffered = playerColor;
     axios.put(
             SERVER_ENDPOINT + "/move/" + gameId,
@@ -199,7 +196,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         width: "700px",
       }}
     >
-      <h2> Current player turn: {turn} </h2>
+      {/* <h2> Current player turn: {turn} </h2> */}
       <Chessboard
         alignContent="center"
         position={game.fen()}
@@ -356,7 +353,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         </Button>
         ]}
       >
-        {gameStatus}
+        Your opponent is offering a draw
       </Modal>
     </div>
     <button onClick={offerDraw} style = {{padding : "10px", marginTop : "15px", margin : "3px" , width : "20%"}}>

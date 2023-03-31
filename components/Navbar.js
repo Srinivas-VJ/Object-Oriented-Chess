@@ -1,18 +1,29 @@
 import Link from "next/link";
 import Image from "next/image";
-import React, { useState } from "react";
-// import Logo from "./Logo";
+import React, { useEffect, useState } from "react";
 import NavItem from "./NavItem";
+import { getAuthToken, getUserDetails } from "../utils/authenticate";
 
-const MENU_LIST = [
-  { text: "Home", href: "/" },
-  { text: "About Us", href: "/about" },
-  { text: "Login/Signup", href: "/login" }
-  // { text: "Logout", href : "/logout"},
-];
 const Navbar = () => {
+  
+  var user = getUserDetails();
+
   const [navActive, setNavActive] = useState(null);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [mainMenu, setMenu] = useState([
+    { text: "Home", href: "/" },
+    { text: "About Us", href: "/about" },
+    { text: "Login/Signup", href: "/login"}
+  ])
+
+  useEffect( () => {
+    if (user != null) {
+      const newMenu = mainMenu;
+      newMenu[2]["text"] = user.username;
+      newMenu[2]["href"] = "/users/" + user.username;
+      setMenu(newMenu)
+    }
+  }, [])
 
   return (
     <header>
@@ -30,7 +41,7 @@ const Navbar = () => {
           <div></div>
         </div>
         <div className={`${navActive ? "active" : ""} nav__menu-list`} style = {{background : "rgb(193 137 81)"}}>
-          {MENU_LIST.map((menu, idx) => (
+          {mainMenu.map((menu, idx) => (
             <div
               onClick={() => {
                 setActiveIdx(idx);

@@ -28,7 +28,10 @@ const Users = () => {
   return (
     <div>
       <h1>Users</h1>
-      <p>{JSON.stringify(users)}</p>
+      <pre>
+      <p>{JSON.stringify(users, null, 4)}</p>
+      </pre>
+      
     </div>
   );
 };
