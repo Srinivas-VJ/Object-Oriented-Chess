@@ -35,7 +35,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                         .profilePicture(user.getAttribute("picture"))
                         .password(null)
                         .providerType(Provider.GOOGLE)
-                        .username(Objects.requireNonNull(user.getAttribute("given_name")).toString().replaceAll(" ", "_"))
+                        .username(Objects.requireNonNull(user.getAttribute("given_name")).toString().replace(" ", "_"))
                         .build();
             }
             // github
@@ -49,7 +49,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                         .profilePicture(user.getAttribute("avatar_url"))
                         .password(null)
                         .providerType(Provider.GITHUB)
-                        .username(Objects.requireNonNull(user.getAttribute("login")).toString().replaceAll(" ", "_"))
+                        .username(Objects.requireNonNull(user.getAttribute("login")).toString().replace(" ", "_"))
                         .build();
             }
             userRepository.save(newUser);

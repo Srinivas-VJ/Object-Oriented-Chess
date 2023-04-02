@@ -1,6 +1,5 @@
 package com.example.chess.pieces;
 public class King extends Piece {
-    public boolean hasMoved = false;
     public King(Colour color) {
         super(color, Variant.KING);
     }

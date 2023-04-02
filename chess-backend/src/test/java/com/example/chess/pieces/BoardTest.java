@@ -1,5 +1,6 @@
 package com.example.chess.pieces;
 
+import com.example.chess.Board.Board;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;

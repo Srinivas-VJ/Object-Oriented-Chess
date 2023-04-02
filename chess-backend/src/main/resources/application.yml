@@ -11,11 +11,5 @@ management:
         allowed-methods: GET ,POST
 
 spring:
-  devtools:
-    livereload:
-      enabled: false
   profiles:
     active: prod
-
-
-

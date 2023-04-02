@@ -1,5 +1,6 @@
 package com.example.chess.pieces;
 
+import com.example.chess.Board.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,6 +28,6 @@ class BishopTest {
     void BishopShouldMove() {
         boardObj = new Board("r1bqkbnr/ppp2ppp/8/3p4/3pPB2/3P3P/PPP2PP1/RN1QKB1R b KQkq - 0 6");
         Piece[][] board = boardObj.getGame_board();
-        assertEquals(boardObj.getMoveStatus("f4", "e5", Colour.WHITE, "") , 0);
+        assertEquals(0, boardObj.getMoveStatus("f4", "e5", Colour.WHITE, ""));
     }
 }

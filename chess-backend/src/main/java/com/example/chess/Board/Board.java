@@ -1,5 +1,6 @@
-package com.example.chess.pieces;
+package com.example.chess.Board;
 
+import com.example.chess.pieces.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -120,7 +121,6 @@ public class Board {
                 player = player == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
                 if (playerHasValidMove(player))
                 {
-                    player = player == Colour.WHITE ? Colour.BLACK : Colour.WHITE;
                     if (game_board[r2][c2].type == Variant.KING || game_board[r2][c2].type == Variant.ROOK)
                         game_board[r2][c2].hasMoved = true;
                 }

@@ -1,6 +1,7 @@
 
 package com.example.chess.pieces;
 
+import com.example.chess.Board.Board;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

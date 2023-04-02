@@ -5,7 +5,7 @@ import com.example.chess.exception.GameHasNoPlayerException;
 import com.example.chess.exception.GameNotFoundException;
 import com.example.chess.exception.InvalidMoveException;
 import com.example.chess.exception.UserNotFoundException;
-import com.example.chess.pieces.Board;
+import com.example.chess.Board.Board;
 import com.example.chess.pieces.Colour;
 import com.example.chess.service.GameService;
 import com.example.chess.service.UserService;
@@ -97,27 +97,28 @@ public class GameController {
         Game game = ongoingGames.get(gameId);
         Authentication authenticatedUser = SecurityContextHolder.getContext().getAuthentication();
         String playerChar = moveRequestMessage.getFen().split(" ")[1];
+        String destinationPath = "/topic/move/" + gameId;
 
         if (!ongoingGames.containsKey(gameId))
             throw new GameNotFoundException();
 
         // check resignation
         if (moveRequestMessage.isResign()) {
-            template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
+            template.convertAndSend(destinationPath,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",moveRequestMessage.getColor() + " resigned", moveRequestMessage.getDrawState()));
             handleGameOver(game, 3, playerChar.equals("b") ? Colour.BLACK : Colour.WHITE);
             gameStates.remove(gameId);
             return ResponseEntity.ok("Success!");
         }
         // check draw accepted
         if (DrawState.ACCEPTED.equals(moveRequestMessage.getDrawState())) {
-            template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
+            template.convertAndSend(destinationPath, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by agreement", moveRequestMessage.getDrawState()));
             handleGameOver(game, 4, playerChar.equals("b") ? Colour.BLACK : Colour.WHITE);
             gameStates.remove(gameId);
             return ResponseEntity.ok("Success!");
         }
         // check draw offered
         if (DrawState.OFFERED.equals(moveRequestMessage.getDrawState())) {
-            template.convertAndSend("/topic/move/" + gameId ,new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
+            template.convertAndSend(destinationPath ,new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
             return ResponseEntity.ok("Success!");
         }
 
@@ -130,20 +131,20 @@ public class GameController {
             int status = board.getMoveStatus(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), player, moveRequestMessage.getFen());
             switch (status) {
                 case 0 -> {
-                    template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
+                    template.convertAndSend(destinationPath, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "active", "ongoing game", moveRequestMessage.getDrawState()));
                     gameStates.put(gameId, moveRequestMessage.getFen());
                     return ResponseEntity.ok("Success!");
                 }
                 case 1 ->
                 {
-                    template.convertAndSend("/topic/move/" + gameId,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
+                    template.convertAndSend(destinationPath,  new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed",player + " wins by Checkmate", moveRequestMessage.getDrawState()));
                     handleGameOver(game, 1, player);
                     gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
                 }
                 case 2 ->
                 {
-                    template.convertAndSend("/topic/move/" + gameId, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
+                    template.convertAndSend(destinationPath, new MoveResponseMessage(moveRequestMessage.getFrom(), moveRequestMessage.getTo(), moveRequestMessage.getColor(), moveRequestMessage.getFen(), "completed", "Game drawn by Stalemate", moveRequestMessage.getDrawState()));
                     handleGameOver(game, 2, player);
                     gameStates.remove(gameId);
                     return ResponseEntity.ok("Success!");
@@ -195,8 +196,8 @@ public class GameController {
         int factor = 30;
         int winnerRating = winner.getRating().get(winner.getRating().size() - 1);
         int loserRating = loser.getRating().get(loser.getRating().size() - 1);
-        float winningProbabilityOfWinner = calculateWinningProbability((float) loserRating, (float) winnerRating);
-        float winningProbabilityOfLoser = calculateWinningProbability((float) winnerRating, (float) loserRating);
+        float winningProbabilityOfWinner = calculateWinningProbability(loserRating, winnerRating);
+        float winningProbabilityOfLoser = calculateWinningProbability(winnerRating, loserRating);
         winnerRating = Math.round(winnerRating + factor * (1 - winningProbabilityOfWinner));
         loserRating = Math.round(loserRating + factor * (0 - winningProbabilityOfLoser));
         winner.getRating().add(winnerRating);
