@@ -18,7 +18,7 @@ spring:
             clientId: ${CLIENT_ID_GITHUB}
             clientSecret: ${CLIENT_SECRET_GITHUB}
 frontend:
-  url : '${FRONTEND}'
+  url : http://localhost:3000
 
 encryption:
   secret: '${KEY}'

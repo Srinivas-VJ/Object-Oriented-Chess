@@ -13,7 +13,6 @@ public class MoveRequestMessage {
     private String from;
     private String to;
     private String color;
-    private String fen;
     private boolean resign;
     @Enumerated(EnumType.STRING)
     private DrawState drawState;

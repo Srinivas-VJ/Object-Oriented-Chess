@@ -9,9 +9,6 @@ import java.util.ArrayList;
 @Getter
 public class Board {
     private Piece[][] game_board;
-    public Board() {
-        game_board = new Piece[8][8];
-    }
     // constructor with fen string
     public Board(String fen) {
         this();
@@ -48,8 +45,45 @@ public class Board {
         }
         return ;
     }
+    public Board() {
+        game_board = new Piece[8][8];
+        // making the pawns
+        for (int r = 0; r < 8; r++) {
+            for (int c = 0; c < 8; c++) {
+                if (r == 6)
+                    game_board[r][c] = new Pawn(Colour.WHITE);
+                else if (r == 1)
+                    game_board[r][c] = new Pawn(Colour.BLACK);
+            }
+        }
 
-    public int getMoveStatus(String from, String to, Colour player, String fen) {
+        // making the Kings
+        game_board[0][4] = new King(Colour.BLACK);
+        game_board[7][4] = new King(Colour.WHITE);
+
+        // making the Queens
+        game_board[0][3] = new Queen(Colour.BLACK);
+        game_board[7][3] = new Queen(Colour.WHITE);
+
+        // making the Rooks
+        game_board[0][0] = new Rook(Colour.BLACK);
+        game_board[0][7] = new Rook(Colour.BLACK);
+        game_board[7][0] = new Rook(Colour.WHITE);
+        game_board[7][7] = new Rook(Colour.WHITE);
+
+        // making the Bishops
+        game_board[0][2] = new Bishop(Colour.BLACK);
+        game_board[0][5] = new Bishop(Colour.BLACK);
+        game_board[7][2] = new Bishop(Colour.WHITE);
+        game_board[7][5] = new Bishop(Colour.WHITE);
+
+        // making the Knights
+        game_board[0][1] = new Knight(Colour.BLACK);
+        game_board[0][6] = new Knight(Colour.BLACK);
+        game_board[7][1] = new Knight(Colour.WHITE);
+        game_board[7][6] = new Knight(Colour.WHITE);
+    }
+    public int getMoveStatus(String from, String to, Colour player) {
         int r1 = '8' - from.charAt(1);
         int c1 = from.charAt(0) - 'a';
         int r2 = '8' - to.charAt(1);
@@ -65,23 +99,23 @@ public class Board {
         }
         else {
             // check if castling
-            String castle = fen.split(" ")[2];
+//            String castle = fen.split(" ")[2];
             // white
             if (r1 == 7 && c1 == 4 && player.equals(Colour.WHITE)) {
                 // queen side
-                if (r2 == 7 && c2 == 2 && castle.contains("Q"))
+                if (r2 == 7 && c2 == 2)
                     return 0;
                 // king side
-                if (r2 == 7 && c2 == 6 && castle.contains("K"))
+                if (r2 == 7 && c2 == 6)
                     return 0;
             }
             // black
             else if (r1 == 0 && c1 == 4 && player.equals(Colour.BLACK)) {
                 // queen side
-                if (r2 == 0 && c2 == 2 && castle.contains("q"))
+                if (r2 == 0 && c2 == 2)
                     return 0;
                 // king side
-                if (r2 == 0 && c2 == 6 && castle.contains("k"))
+                if (r2 == 0 && c2 == 6)
                     return 0;
             }
             return -1; // code for invalid  move
@@ -185,7 +219,6 @@ public class Board {
                 }
         return moves.toArray(new int[moves.size()][]);
     }
-
     public boolean playerHasValidMove(Colour Player) {
         Piece[][] board = game_board;
         Piece temp;
@@ -225,44 +258,6 @@ public class Board {
         }
         */
         return false;
-    }
-
-    private void initBoard(Piece[][] b) {
-        // making the pawns
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
-                if (r == 6)
-                    b[r][c] = new Pawn(Colour.WHITE);
-                else if (r == 1)
-                    b[r][c] = new Pawn(Colour.BLACK);
-            }
-        }
-
-        // making the Kings
-        b[0][4] = new King(Colour.BLACK);
-        b[7][4] = new King(Colour.WHITE);
-
-        // making the Queens
-        b[0][3] = new Queen(Colour.BLACK);
-        b[7][3] = new Queen(Colour.WHITE);
-
-        // making the Rooks
-        b[0][0] = new Rook(Colour.BLACK);
-        b[0][7] = new Rook(Colour.BLACK);
-        b[7][0] = new Rook(Colour.WHITE);
-        b[7][7] = new Rook(Colour.WHITE);
-
-        // making the Bishops
-        b[0][2] = new Bishop(Colour.BLACK);
-        b[0][5] = new Bishop(Colour.BLACK);
-        b[7][2] = new Bishop(Colour.WHITE);
-        b[7][5] = new Bishop(Colour.WHITE);
-
-        // making the Knights
-        b[0][1] = new Knight(Colour.BLACK);
-        b[0][6] = new Knight(Colour.BLACK);
-        b[7][1] = new Knight(Colour.WHITE);
-        b[7][6] = new Knight(Colour.WHITE);
     }
     public void printBoard() {
         for (int r = 0; r < 8; r++) {

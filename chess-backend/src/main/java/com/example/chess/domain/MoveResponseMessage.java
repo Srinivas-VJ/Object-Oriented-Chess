@@ -13,7 +13,6 @@ public class MoveResponseMessage {
     private String from;
     private String to;
     private String color;
-    private String fen;
     private String status;
     private String message;
     @Enumerated(EnumType.STRING)

@@ -15,7 +15,7 @@ var drawOffered = "null"
 
 export default function PlayGame(player1, player2, gameId, playerColor) {
   const [game, setGame] = useState(chess);
-  const [turn, setTurn] = useState("white");
+  const [turn, setTurn] = useState("WHITE");
   const [visible, setVisible] = useState(false);
   const [gameStatus, setGameStatus] = useState("Game Over!");
   const [headers, setHeaders] = useState({})
@@ -37,7 +37,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
             {
               from: "",
               to: "",
-              color: "",
+              color: playerColor,
               fen: game.fen(),
               drawState : "OFFERED"
             },
@@ -89,55 +89,49 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
     stompClient.connect({}, function (frame) {
       var path = "/topic/move/" + gameId;
       stompClient.subscribe(path, function (greeting) {
-        const move = JSON.parse(greeting.body);
-        if (move.drawState == "OFFERED") {
-          console.log(`${drawOffered} - ${playerColor}  =====================================`)
-          if (drawOffered != playerColor) 
-            setDrawOfferVisible(true)
-          else
-            drawOffered = "null";
-        }
-        if (move.color != playerColor) {
-          makeAMove(
-            {
-              from: move.from,
-              to: move.to,
-              promotion: "q", // always promote to a queen for example simplicity
-            },
-            move.fen
-          );
-        }
-        if (move.status != "active") {
-          setGameStatus(move.message);
-          setVisible(true);
-        }
+        setTimeout(function() {
+          const move = JSON.parse(greeting.body);
+          if (move.drawState == "OFFERED") {
+            console.log(`${drawOffered} - ${playerColor}  =====================================`)
+            if (drawOffered != playerColor) 
+              setDrawOfferVisible(true)
+            else
+              drawOffered = "null";
+          }
+          console.log(`${move.color} == ${turn}`)
+          if (move.color == 'w')
+            move.color = "WHITE"
+          if (move.color == 'b')
+            move.color = "BLACK"
+          if (move.color == turn) {
+            makeAMove(
+              {
+                from: move.from,
+                to: move.to,
+                promotion: "q", // always promote to a queen for example simplicity
+                color: move.color
+              }, true);
+          }
+          if (move.status != "active") {
+            setGameStatus(move.message);
+            setVisible(true);
+          }
+        }, 100);
       });
     });
-    // get fen from backend
-    axios
-      .get(SERVER_ENDPOINT + "/game/" + gameId + "/getFen", { headers })
-      .then((res) => {
-        const gameCopy = new Chess();
-        gameCopy.load(res.data);
-        setGame(gameCopy);
-        if (res.data.split()[1] == "w" ? setTurn("white") : setTurn("black"));
-        console.log(res.data);
-      });
   }, []);
 
   useEffect(() => {}, [turn]);
 
-  function makeAMove(move, fen) {
+  function makeAMove(move, isVerified) {
     try {
-      const gameCopy = new Chess();
-      gameCopy.load(fen);
+      const gameCopy = game;
       const result = gameCopy.move(move);
       setGame(gameCopy);
-      const tempTurn = fen.split(" ")[1];
+      const tempTurn = move.color;
       if (result != null) {
-        setTurn(tempTurn == "w" ? "black" : "white");
         let path = "/app/move/" + gameId;
-
+        if (!isVerified) {
         axios
           .put(
             SERVER_ENDPOINT + "/move/" + gameId,
@@ -145,46 +139,36 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
               from: move.from,
               to: move.to,
               color: playerColor,
-              fen: game.fen(),
             },
             { headers }
           )
           .then((res) => {
             console.log(res);
-            axios
-              .put(
-                SERVER_ENDPOINT + "/game/" + gameId + "/moved",
-                {
-                  from: move.from,
-                  to: move.to,
-                  color: playerColor,
-                  fen: gameCopy.fen(),
-                  drawState : "NULL"
-                },
-                { headers }
-              )
-              .then((res) => console.log(res))
-              .catch((err) => console.log(err));
+            setTurn(tempTurn == "WHITE" ? "BLACK" : "WHITE");
           })
           .catch((err) => console.log(err));
       }
+      else 
+        setTurn(tempTurn == "WHITE" ? "BLACK" : "WHITE");
       return result; // null if the move was illegal, the move object if the move was legal
     }
-    catch {
-      console.log("INVALID MOVE");
+    }
+    catch (e) {
+      console.log("INVALID MOVE" +  e);
     }
   }
 
   function onDrop(sourceSquare, targetSquare) {
-    if (game.get(sourceSquare).color != playerColor[0]) return false;
+    console.log(game.get(sourceSquare).color , playerColor);
+    if (game.get(sourceSquare).color != playerColor[0].toLowerCase()) return false;
     const move = makeAMove(
       {
         from: sourceSquare,
         to: targetSquare,
         promotion: "q", // always promote to a queen for example simplicity
+        color: playerColor
       },
-      game.fen()
-    );
+    false);
     if (move === null) return false;
       return true;
   }
@@ -196,12 +180,12 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
         width: "700px",
       }}
     >
-      {/* <h2> Current player turn: {turn} </h2> */}
+      <h2> Current player turn: {turn} </h2>
       <Chessboard
         alignContent="center"
         position={game.fen()}
         onPieceDrop={onDrop}
-        boardOrientation={playerColor}
+        boardOrientation={playerColor.toLowerCase()}
         // customDarkSquareStyle={{ borderRadius: '5px'}}
         customPieces={{
           bK: ({ squareWidth = "32px" }) => (
@@ -366,6 +350,7 @@ export default function PlayGame(player1, player2, gameId, playerColor) {
 
   );
 }
+
 PlayGame.getInitialProps = async ({ query }) => {
   const player1 = query.player1;
   const player2 = query.player2;

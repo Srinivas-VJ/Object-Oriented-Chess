@@ -9,7 +9,7 @@ const GamePage = () => {
   const [player1, setPlayer1] = useState("");
   const [player2, setPlayer2] = useState("");
   const [gameId, setGameId] = useState("");
-  const [currentPlayerColor, setCurrentPlayerColor] = useState("white");
+  const [currentPlayerColor, setCurrentPlayerColor] = useState("WHITE");
   const [jwttoken, setToken] = useState(null);
   const router = useRouter();
 
@@ -31,7 +31,7 @@ const GamePage = () => {
     const response = await axios.post(URL, {
       playerWhite: player1,
       playerBlack: player2,
-      currentPlayerColor: "white",
+      currentPlayerColor: "WHITE",
       moves: [],
       status: "intialted",
       description: "fresh game",
@@ -85,8 +85,8 @@ const GamePage = () => {
               id="color"
               onChange={(e) => setCurrentPlayerColor(e.target.value)}
             >
-              <option value="white">WHITE</option>
-              <option value="black">BLACK</option>
+              <option value="WHITE">WHITE</option>
+              <option value="BLACK">BLACK</option>
             </select>
           </div>
           <div className="form-group"></div>

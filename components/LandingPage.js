@@ -16,7 +16,7 @@ const LandingPage = () => {
   const router = useRouter();
 
   const handleAccept = () => {
-    const currentPlayerColor = game.playerBlack == user.username ? "black" : "white"
+    const currentPlayerColor = game.playerBlack == user.username ? "BLACK" : "WHITE"
     const playerWhite = game.playerWhite
     const playerBlack = game.playerBlack
     const gameId = game.gameID

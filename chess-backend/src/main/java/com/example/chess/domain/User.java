@@ -1,10 +1,19 @@
 package com.example.chess.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +45,17 @@ public class User implements UserDetails  {
     private List<Integer> rating;
     @Enumerated(EnumType.STRING)
     private Provider providerType;
+//    @JsonIgnore
+//    @Transient
+//    @Autowired
+//    private SimpMessagingTemplate template;
+
+//    public void notifyChallenge() {
+//        System.out.println("Challenge sent");
+//    }
+//    public void notifyMove(String destinationPath, MoveResponseMessage moveResponseMessage) {
+//        template.convertAndSend(destinationPath, moveResponseMessage);
+//    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
