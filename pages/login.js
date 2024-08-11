@@ -13,11 +13,16 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post(SERVER_ENDPOINT + "/auth/authenticate", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        SERVER_ENDPOINT + "/auth/authenticate",
+        {
+          email,
+          password,
+        }
+        // { withCredentials: true }
+      );
       console.log(response.data);
+      console.log(response);
       const token = response.data.token;
       const user = response.data.userResponse;
       setAuthToken(token);
@@ -75,10 +80,7 @@ const Login = () => {
         </Form>
 
         <div>
-          Don't have an account?{" "}
-          <Link href={"/register"}>
-              Register here
-          </Link>
+          Don't have an account? <Link href={"/register"}>Register here</Link>
         </div>
       </div>
     </div>

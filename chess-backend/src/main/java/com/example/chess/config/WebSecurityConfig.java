@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +31,16 @@ public class WebSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return new CustomUserDetailsService();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+            }
+        };
     }
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -48,20 +60,14 @@ public class WebSecurityConfig {
     @Bean
     protected DefaultSecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
-                .cors().and().csrf().disable()
-//                    .oauth2Login()
-//                    .userInfoEndpoint().userService(customOAuth2Service)
-//                    .and()
-//                    .successHandler(oAuth2LoginSuccessHandler)
-//                .and()
+                .cors().disable()
+                .csrf().disable()
                 .authorizeHttpRequests()
                 .requestMatchers( "/test" , "/auth/**", "/gs-guide-websocket/**", "/game/**", "/login**", "/oauth2**", "/callback/", "/webjars/**", "/auth/**", "/", "/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users", "/game", "/actuator**").hasRole("ADMIN")
                 .requestMatchers("/users/**", "/game/**").hasAnyRole("ADMIN", "USER")
                 .anyRequest().authenticated()
                 .and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
                 .logout(l -> l.logoutSuccessUrl("/").permitAll())
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

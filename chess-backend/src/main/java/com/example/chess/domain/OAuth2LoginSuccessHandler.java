@@ -1,11 +1,14 @@
 package com.example.chess.domain;
 
 import com.example.chess.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.shaded.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -18,42 +21,27 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        CustomOAuth2User user  = (CustomOAuth2User) authentication.getPrincipal();
-        Optional<User> existingUser = userRepository.findByUserEmail(user.getAttribute("email"));
+        DefaultOidcUser oauthUser = (DefaultOidcUser) authentication.getPrincipal();
+        String email = oauthUser.getAttribute("email");
+        Optional<User> existingUser = userRepository.findByUserEmail(email);
         if (existingUser.isEmpty()) {
-            // google
-            User newUser;
-            if (user.getAttributes().containsKey("sub")) {
-                newUser = User.builder()
-                        .userEmail(user.getEmail())
-                        .rating(List.of(600))
-                        .gamesWon(0)
-                        .gamesLost(0)
-                        .gamesDrawn(0)
-                        .profilePicture(user.getAttribute("picture"))
-                        .password(null)
-                        .providerType(Provider.GOOGLE)
-                        .username(Objects.requireNonNull(user.getAttribute("given_name")).toString().replace(" ", "_"))
-                        .build();
-            }
-            // github
-            else {
-                newUser = User.builder()
-                        .userEmail(user.getEmail())
-                        .rating(List.of(600))
-                        .gamesWon(0)
-                        .gamesLost(0)
-                        .gamesDrawn(0)
-                        .profilePicture(user.getAttribute("avatar_url"))
-                        .password(null)
-                        .providerType(Provider.GITHUB)
-                        .username(Objects.requireNonNull(user.getAttribute("login")).toString().replace(" ", "_"))
-                        .build();
-            }
-            userRepository.save(newUser);
+            userRepository.save(User.builder()
+                    .userEmail(email)
+                    .rating(List.of(600))
+                    .gamesWon(0)
+                    .gamesLost(0)
+                    .gamesDrawn(0)
+                    .profilePicture(oauthUser.getAttribute("picture"))
+                    .password(null)
+                    .providerType(Provider.GOOGLE)
+                    .username(Objects.requireNonNull(oauthUser.getAttribute("given_name")).toString().replace(" ", "_"))
+                    .build());
         }
+        this.setAlwaysUseDefaultTargetUrl(true);
+        this.setDefaultTargetUrl("http://localhost:3000");
         super.onAuthenticationSuccess(request, response, authentication);
     }
 }
