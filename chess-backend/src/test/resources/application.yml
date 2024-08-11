@@ -8,20 +8,3 @@ spring:
     hibernate.ddl-auto: create-drop
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            clientId: 274362409729-r4173qp1dmr676r1qr7hbuo5fhjg10m3.apps.googleusercontent.com
-            clientSecret: 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
-            scope: email, profile
-          github:
-            clientId: a2a67a722c684b22ad53
-            clientSecret: 953a8756c21363a25cfa839f08fd2bb722f9a94a
-
-encryption:
-  secret: "42264528482B4D6251655468576D5A7134743777217A25432A462D4A404E6352"
-
-frontend:
-  url : "http://10.91.1.59:3000"
