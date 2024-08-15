@@ -24,7 +24,6 @@ import java.security.Principal;
 import java.util.*;
 
 @RestController()
-@CrossOrigin(origins = "https://srinivas-vj.github.io")
 public class GameController {
     @Autowired
     private GameService gameService;

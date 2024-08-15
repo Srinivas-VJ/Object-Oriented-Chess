@@ -60,8 +60,8 @@ public class WebSecurityConfig {
     @Bean
     protected DefaultSecurityFilterChain configure(HttpSecurity http) throws Exception {
         return http
-                .cors().disable()
                 .csrf().disable()
+                .cors(cors -> cors.disable())
                 .authorizeHttpRequests()
                 .requestMatchers( "/test" , "/auth/**", "/gs-guide-websocket/**", "/game/**", "/login**", "/oauth2**", "/callback/", "/webjars/**", "/auth/**", "/", "/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/users", "/game", "/actuator**").hasRole("ADMIN")
