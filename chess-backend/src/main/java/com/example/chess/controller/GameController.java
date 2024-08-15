@@ -24,7 +24,6 @@ import java.security.Principal;
 import java.util.*;
 
 @RestController()
-@CrossOrigin(origins = "${frontend.url}")
 public class GameController {
     @Autowired
     private GameService gameService;
